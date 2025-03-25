@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euler's Method - MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn active">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html" class="active">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html">Functions</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="intro">
+                <h2>Euler's Method</h2>
+                <p>Euler's method is one of the simplest numerical techniques for solving ordinary differential equations (ODEs). Despite its simplicity, it forms the foundation for understanding more complex numerical methods and provides valuable insights into the numerical solution of differential equations.</p>
+                
+                <p>In this guide, we'll explore the mathematical principles behind Euler's method, implement it in MATLAB, analyze its accuracy and stability, and apply it to solve practical engineering problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Mathematical Foundation</h3>
+                
+                <h4>The Basic Concept</h4>
+                <p>Consider a first-order ordinary differential equation (ODE) of the form:</p>
+                
+                <div class="equation">
+                    \[ \frac{dy}{dt} = f(t, y) \]
+                </div>
+                
+                <p>with an initial condition:</p>
+                
+                <div class="equation">
+                    \[ y(t_0) = y_0 \]
+                </div>
+                
+                <p>Euler's method approximates the solution by taking small steps along the tangent line at each point. The core idea comes from the definition of the derivative and a first-order Taylor series approximation:</p>
+                
+                <div class="equation">
+                    \[ y(t + h) \approx y(t) + h \cdot \frac{dy}{dt} = y(t) + h \cdot f(t, y(t)) \]
+                </div>
+                
+                <p>where \(h\) is a small step size.</p>
+                
+                <p>This gives us the iterative formula for Euler's method:</p>
+                
+                <div class="equation">
+                    \[ y_{n+1} = y_n + h \cdot f(t_n, y_n) \]
+                </div>
+                
+                <p>where:</p>
+                <ul>
+                    <li>\(y_n\) is the approximation of \(y\) at time \(t_n\)</li>
+                    <li>\(y_{n+1}\) is the approximation of \(y\) at time \(t_{n+1} = t_n + h\)</li>
+                    <li>\(h\) is the step size</li>
+                    <li>\(f(t_n, y_n)\) is the right-hand side of the ODE evaluated at \((t_n, y_n)\)</li>
+                </ul>
+                
+                <h4>Geometric Interpretation</h4>
+                <p>Geometrically, Euler's method approximates the solution curve by a series of straight-line segments. At each point, the method:</p>
+                <ol>
+                    <li>Calculates the slope of the solution curve using the differential equation: \(f(t_n, y_n)\)</li>
+                    <li>Follows the tangent line for a distance of \(h\) to find the next approximation point</li>
+                </ol>
+                
+                <p>This process is repeated to generate a sequence of points that approximate the true solution curve.</p>
+                
+                <h4>Error Analysis</h4>
+                <p>Euler's method has two types of errors:</p>
+                
+                <ol>
+                    <li><strong>Local truncation error</strong>: The error introduced in a single step, which is proportional to \(h^2\) (second-order in \(h\))</li>
+                    <li><strong>Global truncation error</strong>: The accumulated error over all steps, which is proportional to \(h\) (first-order in \(h\))</li>
+                </ol>
+                
+                <p>This means that halving the step size will approximately halve the global error, making Euler's method a first-order method.</p>
+                
+                <h4>Stability Considerations</h4>
+                <p>Euler's method has limited stability, especially for stiff differential equations. For the test equation \(y' = \lambda y\) with \(\lambda < 0\), Euler's method is stable only when:</p>
+                
+                <div class="equation">
+                    \[ |1 + h\lambda| < 1 \]
+                </div>
+                
+                <p>This leads to the stability condition:</p>
+                
+                <div class="equation">
+                    \[ h < \frac{2}{|\lambda|} \]
+                </div>
+                
+                <p>If this condition is not satisfied, numerical errors can grow exponentially, causing the solution to oscillate wildly or diverge.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>MATLAB Implementation</h3>
+                
+                <h4>Basic Implementation</h4>
+                <p>Let's implement Euler's method in MATLAB to solve a simple ODE. We'll start with a basic implementation that demonstrates the core algorithm:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = euler_method(f, tspan, y0, h)
+    % EULER_METHOD Solve ODE using Euler's method
+    %   [T, Y] = EULER_METHOD(F, TSPAN, Y0, H) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using step size H.
+    %
+    %   Inputs:
+    %       F - Function handle representing the ODE: dy/dt = F(t, y)
+    %       TSPAN - [T0, TFINAL] integration interval
+    %       Y0 - Initial condition
+    %       H - Step size
+    %
+    %   Outputs:
+    %       T - Time points
+    %       Y - Solution values at time points
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    
+    % Handle scalar or vector y
+    if isscalar(y0)
+        y = zeros(n_steps + 1, 1);
+    else
+        y = zeros(length(y0), n_steps + 1);
+    end
+    
+    % Set initial values
+    t(1) = t0;
+    if isscalar(y0)
+        y(1) = y0;
+    else
+        y(:, 1) = y0(:);
+    end
+    
+    % Main integration loop
+    for i = 1:n_steps
+        % Current time and state
+        t_current = t(i);
+        y_current = y(:, i);
+        
+        % Calculate slope
+        slope = f(t_current, y_current);
+        
+        % Update time
+        t(i+1) = t_current + h;
+        
+        % Update state using Euler's method
+        y(:, i+1) = y_current + h * slope;
+    end
+    
+    % Transpose y if it's a vector to match MATLAB's ode45 output format
+    if size(y, 1) > 1
+        y = y';
+    end
+end</code></pre>
+                </div>
+                
+                <p>This implementation follows the mathematical formula directly. Let's break down what's happening in the MATLAB code:</p>
+                
+                <ol>
+                    <li>We define a function that takes the ODE function handle, time span, initial condition, and step size as inputs.</li>
+                    <li>We calculate the number of steps needed to cover the time span and adjust the step size to exactly reach the final time.</li>
+                    <li>We initialize arrays to store the time points and solution values.</li>
+                    <li>We set the initial values based on the provided initial condition.</li>
+                    <li>In the main loop, for each step:
+                        <ul>
+                            <li>We calculate the slope using the ODE function: \(f(t_n, y_n)\)</li>
+                            <li>We update the time by adding the step size: \(t_{n+1} = t_n + h\)</li>
+                            <li>We update the state using Euler's formula: \(y_{n+1} = y_n + h \cdot f(t_n, y_n)\)</li>
+                        </ul>
+                    </li>
+                    <li>Finally, we transpose the solution array if needed to match MATLAB's standard format for ODE solvers.</li>
+                </ol>
+                
+                <h4>Handling Systems of ODEs</h4>
+                <p>The implementation above can handle both scalar ODEs and systems of ODEs. For a system, \(y\) is a vector, and \(f(t, y)\) returns a vector of the same size. MATLAB's vectorized operations make it easy to handle systems without changing the core algorithm.</p>
+                
+                <p>For example, to solve the system:</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    \frac{dy_1}{dt} &= y_2 \\
+                    \frac{dy_2}{dt} &= -y_1
+                    \end{align} \]
+                </div>
+                
+                <p>We would define the ODE function as:</p>
+                
+                <div class="code-example">
+                    <pre><code>f = @(t, y) [y(2); -y(1)];</code></pre>
+                </div>
+                
+                <p>And call our Euler method with a vector initial condition:</p>
+                
+                <div class="code-example">
+                    <pre><code>[t, y] = euler_method(f, [0, 10], [1; 0], 0.1);</code></pre>
+                </div>
+                
+                <h4>Vectorized Implementation</h4>
+                <p>For better performance, we can vectorize the implementation to avoid the loop. However, this is only possible for autonomous systems (where \(f\) doesn't depend explicitly on \(t\)):</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = euler_method_vectorized(f, tspan, y0, h)
+    % EULER_METHOD_VECTORIZED Vectorized implementation of Euler's method
+    %   Note: This only works for autonomous systems where f doesn't depend on t
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Generate time points
+    t = linspace(t0, tfinal, n_steps + 1)';
+    
+    % Initialize solution array
+    y = zeros(n_steps + 1, length(y0));
+    y(1, :) = y0(:)';
+    
+    % Vectorized implementation
+    for i = 1:n_steps
+        y(i+1, :) = y(i, :) + h * f(t(i), y(i, :)')';
+    end
+end</code></pre>
+                </div>
+                
+                <p>This implementation is more efficient for large systems or many time steps, but it still requires a loop over time steps.</p>
+                
+                <h4>Comparison with MATLAB's Built-in Solvers</h4>
+                <p>MATLAB provides built-in ODE solvers like <code>ode45</code>, which are more sophisticated than Euler's method. Let's compare our implementation with <code>ode45</code>:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define the ODE: dy/dt = -2y (solution: y = y0*exp(-2t))
+f = @(t, y) -2 * y;
+
+% Time span and initial condition
+tspan = [0, 2];
+y0 = 1;
+
+% Solve using Euler's method with different step sizes
+h_values = [0.1, 0.05, 0.01];
+euler_results = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    euler_results{i} = struct('t', t_euler, 'y', y_euler, 'h', h);
+end
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = y0 * exp(-2 * t_exact);
+
+% Plot results
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y, 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(t_ode45, y_ode45, 's-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison of Numerical Methods');
+legend('show');
+grid on;</code></pre>
+                </div>
+                
+                <p>This code compares Euler's method with different step sizes to the exact solution and MATLAB's <code>ode45</code> solver. The results show that:</p>
+                
+                <ol>
+                    <li>Euler's method becomes more accurate as the step size decreases</li>
+                    <li>MATLAB's <code>ode45</code> is more accurate than Euler's method with the same number of steps</li>
+                    <li>The exact solution provides a reference to evaluate the accuracy of the numerical methods</li>
+                </ol>
+                
+                <p>The key advantage of MATLAB's built-in solvers is that they use adaptive step size control and higher-order methods to achieve better accuracy with fewer steps.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Practical Applications</h3>
+                
+                <h4>Example 1: Exponential Decay</h4>
+                <p>Let's solve the exponential decay equation:</p>
+                
+                <div class="equation">
+                    \[ \frac{dy}{dt} = -k y \]
+                </div>
+                
+                <p>with \(k = 0.5\) and initial condition \(y(0) = 1\).</p>
+                
+                <p>The exact solution is \(y(t) = e^{-kt} = e^{-0.5t}\).</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define the ODE: dy/dt = -k*y
+k = 0.5;
+f = @(t, y) -k * y;
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 1;
+
+% Solve using Euler's method
+h = 0.1;
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(-k * t_exact);
+
+% Calculate error
+interp_exact = interp1(t_exact, y_exact, t_euler);
+abs_error = abs(y_euler - interp_exact);
+rel_error = abs_error ./ abs(interp_exact) * 100;  % Percentage
+
+% Plot results
+figure;
+
+% Solution comparison
+subplot(2, 1, 1);
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler, 'ro-', 'DisplayName', 'Euler');
+xlabel('Time');
+ylabel('y(t)');
+title('Exponential Decay: y'' = -0.5y, y(0) = 1');
+legend('show');
+grid on;
+
+% Error analysis
+subplot(2, 1, 2);
+plot(t_euler, abs_error, 'b-', 'LineWidth', 1.5);
+xlabel('Time');
+ylabel('Absolute Error');
+title(sprintf('Error Analysis (h = %.3f)', h));
+grid on;
+
+% Display maximum error
+max_abs_error = max(abs_error);
+fprintf('Maximum absolute error: %.6e\n', max_abs_error);
+fprintf('Maximum relative error: %.6f%%\n', max(rel_error));</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Define an ODE representing exponential decay</li>
+                    <li>Solve it using Euler's method</li>
+                    <li>Compare the numerical solution with the exact solution</li>
+                    <li>Calculate and visualize the error</li>
+                </ol>
+                
+                <p>The results show that Euler's method provides a reasonable approximation for this simple ODE, but the error increases with time due to the accumulation of local truncation errors.</p>
+                
+                <h4>Example 2: Harmonic Oscillator</h4>
+                <p>Now let's solve a second-order ODE representing a harmonic oscillator:</p>
+                
+                <div class="equation">
+                    \[ \frac{d^2x}{dt^2} + \omega^2 x = 0 \]
+                </div>
+                
+                <p>with \(\omega = 2\) and initial conditions \(x(0) = 1\) and \(x'(0) = 0\).</p>
+                
+                <p>We first convert this to a system of first-order ODEs by defining \(y_1 = x\) and \(y_2 = x'\):</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    \frac{dy_1}{dt} &= y_2 \\
+                    \frac{dy_2}{dt} &= -\omega^2 y_1
+                    \end{align} \]
+                </div>
+                
+                <div class="code-example">
+                    <pre><code>% Define the harmonic oscillator system
+omega = 2;
+f = @(t, y) [y(2); -omega^2 * y(1)];
+
+% Time span and initial conditions
+tspan = [0, 10];
+y0 = [1; 0];  % [position; velocity]
+
+% Solve using Euler's method with different step sizes
+h_values = [0.1, 0.05, 0.01];
+euler_results = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    euler_results{i} = struct('t', t_euler, 'y', y_euler, 'h', h);
+end
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = [cos(omega * t_exact); -omega * sin(omega * t_exact)]';
+
+% Plot results
+figure;
+
+% Position
+subplot(2, 1, 1);
+plot(t_exact, y_exact(:, 1), 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 1), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 1), 's-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Position x(t)');
+title('Harmonic Oscillator: x'''' + 4x = 0, x(0) = 1, x''(0) = 0');
+legend('show');
+grid on;
+
+% Velocity
+subplot(2, 1, 2);
+plot(t_exact, y_exact(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 2), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 2), 's-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Velocity v(t)');
+legend('show');
+grid on;</code></pre>
+                </div>
+                
+                <p>This example demonstrates:</p>
+                <ol>
+                    <li>How to convert a second-order ODE to a system of first-order ODEs</li>
+                    <li>How to solve a system of ODEs using Euler's method</li>
+                    <li>The impact of step size on the accuracy of the solution</li>
+                    <li>The limitations of Euler's method for oscillatory problems</li>
+                </ol>
+                
+                <p>The results show that Euler's method struggles with oscillatory problems, especially with larger step sizes. The numerical solution may not preserve the amplitude of the oscillation and can even become unstable if the step size is too large.</p>
+                
+                <h4>Example 3: Population Growth Model</h4>
+                <p>Let's solve the logistic growth equation, which models population growth with limited resources:</p>
+                
+                <div class="equation">
+                    \[ \frac{dP}{dt} = r P \left(1 - \frac{P}{K}\right) \]
+                </div>
+                
+                <p>where:</p>
+                <ul>
+                    <li>\(P\) is the population size</li>
+                    <li>\(r\) is the intrinsic growth rate</li>
+                    <li>\(K\) is the carrying capacity</li>
+                </ul>
+                
+                <div class="code-example">
+                    <pre><code>% Define the logistic growth model
+r = 0.5;  % Growth rate
+K = 100;  % Carrying capacity
+f = @(t, P) r * P * (1 - P / K);
+
+% Time span and initial condition
+tspan = [0, 20];
+P0 = 10;  % Initial population
+
+% Solve using Euler's method
+h = 0.1;
+[t_euler, P_euler] = euler_method(f, tspan, P0, h);
+
+% Solve using MATLAB's ode45
+[t_ode45, P_ode45] = ode45(f, tspan, P0);
+
+% Exact solution (for logistic equation)
+t_exact = linspace(tspan(1), tspan(2), 1000);
+P_exact = K ./ (1 + ((K / P0) - 1) * exp(-r * t_exact));
+
+% Plot results
+figure;
+plot(t_exact, P_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, P_euler, 'ro-', 'DisplayName', 'Euler');
+plot(t_ode45, P_ode45, 'bs-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Population');
+title('Logistic Growth Model');
+legend('show');
+grid on;
+
+% Calculate and display error
+interp_exact = interp1(t_exact, P_exact, t_euler);
+abs_error = abs(P_euler - interp_exact);
+rel_error = abs_error ./ abs(interp_exact) * 100;  % Percentage
+
+fprintf('Maximum absolute error: %.6f\n', max(abs_error));
+fprintf('Maximum relative error: %.6f%%\n', max(rel_error));</code></pre>
+                </div>
+                
+                <p>This example demonstrates:</p>
+                <ol>
+                    <li>How to model population growth using the logistic equation</li>
+                    <li>How to solve a nonlinear ODE using Euler's method</li>
+                    <li>How to compare the numerical solution with the exact solution</li>
+                </ol>
+                
+                <p>The results show that Euler's method can handle nonlinear ODEs, but the accuracy depends on the step size and the nature of the nonlinearity.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Advanced Topics</h3>
+                
+                <h4>Adaptive Step Size Control</h4>
+                <p>One way to improve Euler's method is to use adaptive step size control, where the step size is adjusted based on the estimated error:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = adaptive_euler(f, tspan, y0, options)
+    % ADAPTIVE_EULER Solve ODE using Euler's method with adaptive step size
+    %   [T, Y] = ADAPTIVE_EULER(F, TSPAN, Y0, OPTIONS) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using adaptive step size control.
+    %
+    %   OPTIONS is a structure with fields:
+    %       InitialStep - Initial step size
+    %       RelTol - Relative tolerance
+    %       AbsTol - Absolute tolerance
+    
+    % Default options
+    if nargin < 4
+        options = struct();
+    end
+    
+    if ~isfield(options, 'InitialStep')
+        options.InitialStep = (tspan(2) - tspan(1)) / 100;
+    end
+    
+    if ~isfield(options, 'RelTol')
+        options.RelTol = 1e-3;
+    end
+    
+    if ~isfield(options, 'AbsTol')
+        options.AbsTol = 1e-6;
+    end
+    
+    % Initialize
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    t = t0;
+    y = y0(:);
+    h = options.InitialStep;
+    
+    % Preallocate arrays with initial capacity
+    capacity = 1000;
+    t_array = zeros(capacity, 1);
+    y_array = zeros(length(y), capacity);
+    
+    % Store initial values
+    t_array(1) = t;
+    y_array(:, 1) = y;
+    count = 1;
+    
+    % Main integration loop
+    while t < tfinal
+        % Ensure we don't go beyond tfinal
+        if t + h > tfinal
+            h = tfinal - t;
+        end
+        
+        % Take a full step
+        y_full = y + h * f(t, y);
+        
+        % Take two half steps
+        y_half = y + (h/2) * f(t, y);
+        y_half_half = y_half + (h/2) * f(t + h/2, y_half);
+        
+        % Estimate error
+        error = norm(y_full - y_half_half) / norm(y_half_half);
+        
+        % Check if step is acceptable
+        if error <= options.RelTol
+            % Accept step
+            t = t + h;
+            y = y_half_half;  % Use more accurate result
+            
+            % Store results
+            count = count + 1;
+            
+            % Resize arrays if needed
+            if count > capacity
+                capacity = capacity * 2;
+                t_array = [t_array; zeros(capacity, 1)];
+                y_array = [y_array, zeros(length(y), capacity)];
+            end
+            
+            t_array(count) = t;
+            y_array(:, count) = y;
+            
+            % Increase step size for next step
+            h = h * min(2, max(0.5, 0.8 * (options.RelTol / error)^(1/2)));
+        else
+            % Reject step and reduce step size
+            h = h * max(0.1, 0.8 * (options.RelTol / error)^(1/2));
+        end
+    end
+    
+    % Trim arrays
+    t = t_array(1:count);
+    y = y_array(:, 1:count)';
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses a simple error estimation technique by comparing a full step with two half steps. The step size is adjusted based on the estimated error to maintain accuracy while minimizing computational cost.</p>
+                
+                <h4>Modified Euler's Method</h4>
+                <p>The modified Euler's method (also known as the Heun's method) is a second-order method that improves accuracy by using the average of the slopes at the beginning and end of the interval:</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    k_1 &= f(t_n, y_n) \\
+                    k_2 &= f(t_n + h, y_n + h \cdot k_1) \\
+                    y_{n+1} &= y_n + \frac{h}{2} (k_1 + k_2)
+                    \end{align} \]
+                </div>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = modified_euler(f, tspan, y0, h)
+    % MODIFIED_EULER Solve ODE using modified Euler's method (Heun's method)
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    
+    % Handle scalar or vector y
+    if isscalar(y0)
+        y = zeros(n_steps + 1, 1);
+    else
+        y = zeros(length(y0), n_steps + 1);
+    end
+    
+    % Set initial values
+    t(1) = t0;
+    if isscalar(y0)
+        y(1) = y0;
+    else
+        y(:, 1) = y0(:);
+    end
+    
+    % Main integration loop
+    for i = 1:n_steps
+        % Current time and state
+        t_current = t(i);
+        y_current = y(:, i);
+        
+        % Calculate slopes
+        k1 = f(t_current, y_current);
+        k2 = f(t_current + h, y_current + h * k1);
+        
+        % Update time
+        t(i+1) = t_current + h;
+        
+        % Update state using modified Euler's method
+        y(:, i+1) = y_current + (h/2) * (k1 + k2);
+    end
+    
+    % Transpose y if it's a vector to match MATLAB's ode45 output format
+    if size(y, 1) > 1
+        y = y';
+    end
+end</code></pre>
+                </div>
+                
+                <p>The modified Euler's method is more accurate than the standard Euler's method, with a global truncation error proportional to \(h^2\) (second-order in \(h\)).</p>
+                
+                <h4>Stability Analysis</h4>
+                <p>Let's analyze the stability of Euler's method by applying it to the test equation \(y' = \lambda y\) with \(\lambda < 0\):</p>
+                
+                <div class="code-example">
+                    <pre><code>% Stability analysis of Euler's method
+lambda = -5;  % Negative value for stable system
+f = @(t, y) lambda * y;
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 1;
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(lambda * t_exact);
+
+% Test different step sizes
+h_values = [0.1, 0.3, 0.4, 0.5];
+results = cell(length(h_values), 1);
+
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Check stability condition
+    stable = abs(1 + h*lambda) < 1;
+    
+    % Solve using Euler's method
+    try
+        [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+        results{i} = struct('t', t_euler, 'y', y_euler, 'h', h, 'stable', stable);
+        
+        % Plot results
+        plot(t_euler, y_euler, 'o-', 'DisplayName', ...
+             sprintf('h=%.1f (%s)', h, conditional(stable, 'stable', 'unstable')));
+    catch
+        fprintf('Solution diverged for h=%.1f\n', h);
+    end
+end
+
+xlabel('Time');
+ylabel('y(t)');
+title(sprintf('Stability Analysis for y'' = %.1fy', lambda));
+legend('show');
+grid on;
+
+% Helper function
+function str = conditional(condition, true_str, false_str)
+    if condition
+        str = true_str;
+    else
+        str = false_str;
+    end
+end</code></pre>
+                </div>
+                
+                <p>This code demonstrates the stability behavior of Euler's method for different step sizes. For the test equation \(y' = \lambda y\) with \(\lambda < 0\), the stability condition is \(h < \frac{2}{|\lambda|}\). When this condition is violated, the numerical solution oscillates or diverges, even though the exact solution decays exponentially.</p>
+                
+                <h4>Comparison with Other Methods</h4>
+                <p>Let's compare Euler's method with other numerical methods for solving ODEs:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Compare different numerical methods
+f = @(t, y) -5 * y;  % Test equation: y' = -5y
+
+% Time span and initial condition
+tspan = [0, 2];
+y0 = 1;
+
+% Step size
+h = 0.1;
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(-5 * t_exact);
+
+% Euler's method
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+
+% Modified Euler's method (Heun's method)
+[t_heun, y_heun] = modified_euler(f, tspan, y0, h);
+
+% MATLAB's built-in solvers
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+[t_ode23, y_ode23] = ode23(f, tspan, y0);
+
+% Calculate errors
+euler_error = abs(y_euler - exp(-5 * t_euler));
+heun_error = abs(y_heun - exp(-5 * t_heun));
+ode45_error = abs(y_ode45 - exp(-5 * t_ode45));
+ode23_error = abs(y_ode23 - exp(-5 * t_ode23));
+
+% Plot results
+figure;
+
+% Solutions
+subplot(2, 1, 1);
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler, 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun, 'go-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45, 'bs-', 'DisplayName', 'ode45');
+plot(t_ode23, y_ode23, 'ms-', 'DisplayName', 'ode23');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison of Numerical Methods');
+legend('show');
+grid on;
+
+% Errors
+subplot(2, 1, 2);
+semilogy(t_euler, euler_error, 'ro-', 'DisplayName', 'Euler Error');
+hold on;
+semilogy(t_heun, heun_error, 'go-', 'DisplayName', 'Heun Error');
+semilogy(t_ode45, ode45_error, 'bs-', 'DisplayName', 'ode45 Error');
+semilogy(t_ode23, ode23_error, 'ms-', 'DisplayName', 'ode23 Error');
+
+xlabel('Time');
+ylabel('Absolute Error');
+title('Error Comparison (Log Scale)');
+legend('show');
+grid on;
+
+% Display maximum errors
+fprintf('Maximum errors:\n');
+fprintf('Euler: %.6e\n', max(euler_error));
+fprintf('Heun: %.6e\n', max(heun_error));
+fprintf('ode45: %.6e\n', max(ode45_error));
+fprintf('ode23: %.6e\n', max(ode23_error));</code></pre>
+                </div>
+                
+                <p>This comparison shows that:</p>
+                <ol>
+                    <li>Euler's method is the simplest but least accurate method</li>
+                    <li>Heun's method (modified Euler) provides better accuracy with the same step size</li>
+                    <li>MATLAB's built-in solvers (<code>ode45</code> and <code>ode23</code>) are more accurate and efficient due to adaptive step size control and higher-order methods</li>
+                </ol>
+                
+                <p>The choice of method depends on the specific problem, required accuracy, and computational constraints.</p>
+            </section>
+            
+            <section class="practice-problems">
+                <h3>Practice Problems</h3>
+                
+                <div class="problem-card">
+                    <h4>Problem 1: Radioactive Decay</h4>
+                    <p>A radioactive substance decays according to the equation:</p>
+                    <div class="equation">
+                        \[ \frac{dN}{dt} = -\lambda N \]
+                    </div>
+                    <p>where \(N\) is the number of radioactive nuclei and \(\lambda\) is the decay constant.</p>
+                    <p>For a substance with half-life of 5 days:</p>
+                    <ol>
+                        <li>Determine the value of \(\lambda\)</li>
+                        <li>Implement Euler's method to simulate the decay over 30 days with an initial amount of 1000 nuclei</li>
+                        <li>Compare the numerical solution with the exact solution</li>
+                        <li>Experiment with different step sizes and analyze the error</li>
+                    </ol>
+                    
+                    <button id="euler-problem1-btn" class="btn">Show Solution</button>
+                    
+                    <div id="euler-problem1-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Radioactive Decay Problem
+% Half-life = 5 days
+half_life = 5;
+
+% Calculate decay constant
+% Using N(t) = N0 * 2^(-t/half_life) = N0 * exp(-lambda * t)
+% At t = half_life, N = N0/2, so exp(-lambda * half_life) = 1/2
+% Therefore, lambda = ln(2) / half_life
+lambda = log(2) / half_life;
+fprintf('Decay constant (lambda): %.4f per day\n', lambda);
+
+% Define the ODE: dN/dt = -lambda * N
+f = @(t, N) -lambda * N;
+
+% Time span and initial condition
+tspan = [0, 30];  % 30 days
+N0 = 1000;        % Initial number of nuclei
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+N_exact = N0 * exp(-lambda * t_exact);
+
+% Solve using Euler's method with different step sizes
+h_values = [5, 1, 0.5, 0.1];
+results = cell(length(h_values), 1);
+
+figure;
+plot(t_exact, N_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    [t_euler, N_euler] = euler_method(f, tspan, N0, h);
+    results{i} = struct('t', t_euler, 'N', N_euler, 'h', h);
+    
+    % Plot results
+    plot(t_euler, N_euler, 'o-', 'DisplayName', sprintf('h=%.1f', h));
+    
+    % Calculate error
+    N_exact_interp = interp1(t_exact, N_exact, t_euler);
+    abs_error = abs(N_euler - N_exact_interp);
+    rel_error = abs_error ./ N_exact_interp * 100;  % Percentage
+    
+    fprintf('Step size h=%.1f:\n', h);
+    fprintf('  Maximum absolute error: %.4f nuclei\n', max(abs_error));
+    fprintf('  Maximum relative error: %.4f%%\n', max(rel_error));
+end
+
+xlabel('Time (days)');
+ylabel('Number of Nuclei');
+title('Radioactive Decay: dN/dt = -\lambda N');
+legend('show');
+grid on;
+
+% Error analysis
+figure;
+for i = 1:length(h_values)
+    result = results{i};
+    N_exact_interp = interp1(t_exact, N_exact, result.t);
+    abs_error = abs(result.N - N_exact_interp);
+    
+    subplot(2, 2, i);
+    plot(result.t, abs_error, 'b-', 'LineWidth', 1.5);
+    xlabel('Time (days)');
+    ylabel('Absolute Error');
+    title(sprintf('Error Analysis (h = %.1f)', result.h));
+    grid on;
+end
+
+% Convergence analysis
+h_convergence = logspace(-3, 0, 10);
+max_errors = zeros(size(h_convergence));
+
+for i = 1:length(h_convergence)
+    h = h_convergence(i);
+    [t_euler, N_euler] = euler_method(f, tspan, N0, h);
+    
+    % Calculate maximum error
+    N_exact_interp = interp1(t_exact, N_exact, t_euler);
+    abs_error = abs(N_euler - N_exact_interp);
+    max_errors(i) = max(abs_error);
+end
+
+figure;
+loglog(h_convergence, max_errors, 'bo-', 'LineWidth', 1.5);
+hold on;
+
+% Fit a line to the log-log data to estimate order of convergence
+p = polyfit(log(h_convergence), log(max_errors), 1);
+loglog(h_convergence, exp(p(2)) * h_convergence.^p(1), 'r--', 'LineWidth', 1.5);
+
+xlabel('Step Size (h)');
+ylabel('Maximum Absolute Error');
+title('Convergence Analysis');
+legend('Numerical Results', sprintf('Fitted Line (slope = %.2f)', p(1)));
+grid on;
+
+fprintf('Estimated order of convergence: %.2f\n', p(1));</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 2: Pendulum Motion</h4>
+                    <p>A simple pendulum of length \(L\) is governed by the equation:</p>
+                    <div class="equation">
+                        \[ \frac{d^2\theta}{dt^2} + \frac{g}{L} \sin(\theta) = 0 \]
+                    </div>
+                    <p>where \(\theta\) is the angle from the vertical, \(g\) is the acceleration due to gravity, and \(L\) is the length of the pendulum.</p>
+                    <ol>
+                        <li>Convert this second-order ODE to a system of first-order ODEs</li>
+                        <li>Implement Euler's method to simulate the pendulum motion for 10 seconds with \(L = 1\) m, \(g = 9.81\) m/s², and initial conditions \(\theta(0) = \pi/6\) rad and \(\theta'(0) = 0\) rad/s</li>
+                        <li>Compare the results with MATLAB's <code>ode45</code> solver</li>
+                        <li>Investigate the effect of step size on the energy conservation of the system</li>
+                    </ol>
+                    
+                    <button id="euler-problem2-btn" class="btn">Show Solution</button>
+                    
+                    <div id="euler-problem2-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Pendulum Motion Problem
+% Parameters
+g = 9.81;  % Acceleration due to gravity (m/s^2)
+L = 1.0;   % Pendulum length (m)
+
+% Convert to system of first-order ODEs
+% Let y(1) = theta and y(2) = theta'
+f = @(t, y) [y(2); -(g/L) * sin(y(1))];
+
+% Time span and initial conditions
+tspan = [0, 10];  % 10 seconds
+y0 = [pi/6; 0];   % Initial angle: pi/6 rad, Initial angular velocity: 0 rad/s
+
+% Solve using Euler's method with different step sizes
+h_values = [0.1, 0.05, 0.01];
+euler_results = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    euler_results{i} = struct('t', t_euler, 'y', y_euler, 'h', h);
+end
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Plot results
+figure;
+
+% Angle
+subplot(2, 1, 1);
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 1), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 1), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time (s)');
+ylabel('Angle \theta (rad)');
+title('Pendulum Motion: \theta'''' + (g/L) sin(\theta) = 0');
+legend('show');
+grid on;
+
+% Angular velocity
+subplot(2, 1, 2);
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 2), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time (s)');
+ylabel('Angular Velocity \omega (rad/s)');
+legend('show');
+grid on;
+
+% Energy analysis
+% Total energy = Kinetic energy + Potential energy
+% E = (1/2) m L^2 \omega^2 + m g L (1 - cos(\theta))
+% For simplicity, we set m = 1
+energy_func = @(theta, omega) 0.5 * L^2 * omega.^2 + g * L * (1 - cos(theta));
+
+figure;
+hold on;
+
+% Calculate energy for ode45 solution (reference)
+E_ode45 = energy_func(y_ode45(:, 1), y_ode45(:, 2));
+E0 = E_ode45(1);  % Initial energy
+plot(t_ode45, E_ode45 / E0, 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+% Calculate energy for Euler solutions
+for i = 1:length(h_values)
+    result = euler_results{i};
+    E_euler = energy_func(result.y(:, 1), result.y(:, 2));
+    plot(result.t, E_euler / E0, 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+    
+    % Calculate energy drift
+    energy_drift = (E_euler(end) - E0) / E0 * 100;  % Percentage
+    fprintf('Step size h=%.3f: Energy drift = %.2f%%\n', result.h, energy_drift);
+end
+
+xlabel('Time (s)');
+ylabel('Normalized Energy (E/E_0)');
+title('Energy Conservation Analysis');
+legend('show');
+grid on;
+
+% Phase space plot
+figure;
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.y(:, 1), result.y(:, 2), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.3f)', result.h));
+end
+
+plot(y_ode45(:, 1), y_ode45(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Angle \theta (rad)');
+ylabel('Angular Velocity \omega (rad/s)');
+title('Phase Space Plot');
+legend('show');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 3: Predator-Prey Model</h4>
+                    <p>The Lotka-Volterra predator-prey model is described by the system of equations:</p>
+                    <div class="equation">
+                        \[ \begin{align}
+                        \frac{dx}{dt} &= \alpha x - \beta xy \\
+                        \frac{dy}{dt} &= \delta xy - \gamma y
+                        \end{align} \]
+                    </div>
+                    <p>where \(x\) is the prey population, \(y\) is the predator population, and \(\alpha\), \(\beta\), \(\gamma\), and \(\delta\) are positive parameters.</p>
+                    <ol>
+                        <li>Implement Euler's method to simulate the predator-prey dynamics for 50 time units with parameters \(\alpha = 1.1\), \(\beta = 0.4\), \(\gamma = 0.4\), \(\delta = 0.1\), and initial populations \(x(0) = 10\) and \(y(0) = 5\)</li>
+                        <li>Plot the population dynamics over time</li>
+                        <li>Create a phase plot of predator vs. prey populations</li>
+                        <li>Compare the results with MATLAB's <code>ode45</code> solver</li>
+                        <li>Investigate the effect of step size on the solution accuracy and stability</li>
+                    </ol>
+                    
+                    <button id="euler-problem3-btn" class="btn">Show Solution</button>
+                    
+                    <div id="euler-problem3-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Predator-Prey Model Problem
+% Parameters
+alpha = 1.1;  % Prey growth rate
+beta = 0.4;   % Prey death rate due to predation
+gamma = 0.4;  % Predator death rate
+delta = 0.1;  % Predator growth rate due to predation
+
+% Define the Lotka-Volterra system
+f = @(t, y) [
+    alpha * y(1) - beta * y(1) * y(2);     % dx/dt
+    delta * y(1) * y(2) - gamma * y(2)     % dy/dt
+];
+
+% Time span and initial conditions
+tspan = [0, 50];  % 50 time units
+y0 = [10; 5];     % Initial populations: x(0) = 10, y(0) = 5
+
+% Solve using Euler's method with different step sizes
+h_values = [0.5, 0.1, 0.05];
+euler_results = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    euler_results{i} = struct('t', t_euler, 'y', y_euler, 'h', h);
+end
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Plot population dynamics over time
+figure;
+
+% Prey population
+subplot(2, 1, 1);
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 1), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.2f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 1), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Prey Population (x)');
+title('Predator-Prey Dynamics: Prey Population');
+legend('show');
+grid on;
+
+% Predator population
+subplot(2, 1, 2);
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.t, result.y(:, 2), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.2f)', result.h));
+end
+
+plot(t_ode45, y_ode45(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Predator Population (y)');
+title('Predator-Prey Dynamics: Predator Population');
+legend('show');
+grid on;
+
+% Phase plot
+figure;
+hold on;
+
+for i = 1:length(h_values)
+    result = euler_results{i};
+    plot(result.y(:, 1), result.y(:, 2), 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.2f)', result.h));
+end
+
+plot(y_ode45(:, 1), y_ode45(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Prey Population (x)');
+ylabel('Predator Population (y)');
+title('Phase Plot: Predator vs. Prey');
+legend('show');
+grid on;
+
+% Conservation law analysis
+% The Lotka-Volterra system has a conserved quantity:
+% H(x, y) = delta * x - gamma * ln(x) + beta * y - alpha * ln(y)
+conserved_func = @(x, y) delta * x - gamma * log(x) + beta * y - alpha * log(y);
+
+figure;
+hold on;
+
+% Calculate conserved quantity for ode45 solution (reference)
+H_ode45 = zeros(size(t_ode45));
+for i = 1:length(t_ode45)
+    H_ode45(i) = conserved_func(y_ode45(i, 1), y_ode45(i, 2));
+end
+H0 = H_ode45(1);  % Initial value
+plot(t_ode45, H_ode45 - H0, 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+% Calculate conserved quantity for Euler solutions
+for i = 1:length(h_values)
+    result = euler_results{i};
+    H_euler = zeros(size(result.t));
+    for j = 1:length(result.t)
+        H_euler(j) = conserved_func(result.y(j, 1), result.y(j, 2));
+    end
+    plot(result.t, H_euler - H0, 'o-', 'DisplayName', ...
+         sprintf('Euler (h=%.2f)', result.h));
+    
+    % Calculate drift in conserved quantity
+    drift = abs(H_euler(end) - H0);
+    fprintf('Step size h=%.2f: Drift in conserved quantity = %.4f\n', result.h, drift);
+end
+
+xlabel('Time');
+ylabel('H(x, y) - H(x_0, y_0)');
+title('Conservation Law Analysis');
+legend('show');
+grid on;
+
+% Stability analysis with larger step sizes
+h_large = [1.0, 2.0];
+figure;
+hold on;
+
+% Reference solution
+plot(y_ode45(:, 1), y_ode45(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+% Test larger step sizes
+for i = 1:length(h_large)
+    h = h_large(i);
+    try
+        [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+        plot(y_euler(:, 1), y_euler(:, 2), 'o-', 'DisplayName', ...
+             sprintf('Euler (h=%.1f)', h));
+    catch
+        fprintf('Solution diverged for h=%.1f\n', h);
+    end
+end
+
+xlabel('Prey Population (x)');
+ylabel('Predator Population (y)');
+title('Stability Analysis with Larger Step Sizes');
+legend('show');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up solution toggles
+            toggleSolution('euler-problem1-btn', 'euler-problem1-solution');
+            toggleSolution('euler-problem2-btn', 'euler-problem2-solution');
+            toggleSolution('euler-problem3-btn', 'euler-problem3-solution');
+        });
+    </script>
+</body>
+</html>

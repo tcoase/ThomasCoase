@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html">Functions</a></li>
+                <li><a href="examples.html">Interactive Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h2>Master MATLAB for Computational Engineering</h2>
+                <p>Welcome to your comprehensive guide to MATLAB programming and numerical methods for computational engineering. This resource is designed to help you understand both the mathematical foundations and practical MATLAB implementations of key computational techniques.</p>
+                <div class="cta-buttons">
+                    <a href="#getting-started" class="btn primary">Get Started</a>
+                    <a href="examples.html" class="btn secondary">Interactive Examples</a>
+                </div>
+            </section>
+            
+            <section id="getting-started" class="content-section">
+                <h2>Getting Started</h2>
+                <p>This website provides a comprehensive guide to MATLAB programming for computational engineering, with a focus on numerical methods. Whether you're a beginner or looking to deepen your understanding, you'll find detailed explanations, code examples, and interactive exercises to help you master these concepts.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Numerical Methods</h3>
+                        <p>Learn the mathematical foundations and MATLAB implementations of key numerical methods including Euler's method, Heun's method, and the Newton-Raphson method.</p>
+                        <a href="eulers-method-enhanced.html" class="feature-link">Explore Numerical Methods</a>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>MATLAB Fundamentals</h3>
+                        <p>Master the essential MATLAB concepts including arrays, vectors, common commands, and control flow structures that form the foundation of effective MATLAB programming.</p>
+                        <a href="functions.html" class="feature-link">Learn MATLAB Basics</a>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>Functions & Programming</h3>
+                        <p>Develop your MATLAB programming skills with comprehensive guides to functions, anonymous functions, function handles, and best practices for organizing your code.</p>
+                        <a href="functions.html" class="feature-link">Master Functions</a>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>Interactive Examples</h3>
+                        <p>Reinforce your learning with interactive examples and challenges that demonstrate the practical application of numerical methods and MATLAB programming.</p>
+                        <a href="examples.html" class="feature-link">Try Examples</a>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2>Featured Content</h2>
+                
+                <div class="featured-content">
+                    <div class="featured-item">
+                        <h3>Euler's Method</h3>
+                        <p>Euler's method is a first-order numerical procedure for solving ordinary differential equations (ODEs) with a given initial value. It is the most basic explicit method for numerical integration of ODEs and serves as the foundation for many more complex methods.</p>
+                        <p>Our comprehensive guide covers:</p>
+                        <ul>
+                            <li>Mathematical foundations and geometric interpretation</li>
+                            <li>Step-by-step MATLAB implementation</li>
+                            <li>Error analysis and stability considerations</li>
+                            <li>Practical applications with complete code examples</li>
+                        </ul>
+                        <a href="eulers-method-enhanced.html" class="btn secondary">Learn Euler's Method</a>
+                    </div>
+                    
+                    <div class="featured-item">
+                        <h3>Newton-Raphson Method</h3>
+                        <p>The Newton-Raphson method is a powerful technique for finding successively better approximations to the roots of a real-valued function. It uses the first few terms of the Taylor series of a function in the vicinity of a suspected root.</p>
+                        <p>Our detailed guide includes:</p>
+                        <ul>
+                            <li>Derivation from Taylor series expansion</li>
+                            <li>Convergence analysis and geometric interpretation</li>
+                            <li>MATLAB implementation for scalar equations and systems</li>
+                            <li>Advanced techniques for handling special cases</li>
+                        </ul>
+                        <a href="newton-raphson-enhanced.html" class="btn secondary">Explore Newton-Raphson</a>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2>Why Learn MATLAB for Computational Engineering?</h2>
+                
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <h3>Industry Standard</h3>
+                        <p>MATLAB is widely used in industry and academia for computational engineering, making it an essential skill for engineers and researchers.</p>
+                    </div>
+                    
+                    <div class="benefit-card">
+                        <h3>Powerful Visualization</h3>
+                        <p>MATLAB provides powerful tools for visualizing data and results, making it easier to understand complex engineering problems.</p>
+                    </div>
+                    
+                    <div class="benefit-card">
+                        <h3>Extensive Toolboxes</h3>
+                        <p>MATLAB offers specialized toolboxes for various engineering disciplines, extending its capabilities for specific applications.</p>
+                    </div>
+                    
+                    <div class="benefit-card">
+                        <h3>Rapid Prototyping</h3>
+                        <p>MATLAB's high-level language allows for rapid prototyping and testing of algorithms before implementation in other languages.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2>Learning Path</h2>
+                
+                <div class="learning-path">
+                    <div class="path-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>MATLAB Fundamentals</h3>
+                            <p>Start with the basics of MATLAB programming, including arrays, vectors, and common commands.</p>
+                            <a href="functions.html" class="step-link">Begin Here</a>
+                        </div>
+                    </div>
+                    
+                    <div class="path-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Control Flow & Functions</h3>
+                            <p>Learn how to control program flow and create reusable functions in MATLAB.</p>
+                            <a href="functions.html" class="step-link">Continue Learning</a>
+                        </div>
+                    </div>
+                    
+                    <div class="path-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Numerical Methods</h3>
+                            <p>Explore the mathematical foundations and MATLAB implementations of key numerical methods.</p>
+                            <a href="eulers-method-enhanced.html" class="step-link">Advance Your Skills</a>
+                        </div>
+                    </div>
+                    
+                    <div class="path-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Practice & Application</h3>
+                            <p>Reinforce your learning with interactive examples and challenges.</p>
+                            <a href="examples.html" class="step-link">Apply Your Knowledge</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="https://www.mathworks.com/help/matlab/" target="_blank">MATLAB Documentation</a></li>
+                        <li><a href="https://www.mathworks.com/matlabcentral/" target="_blank">MATLAB Central</a></li>
+                        <li><a href="https://www.mathworks.com/academia/student_version.html" target="_blank">MATLAB for Students</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+</body>
+</html>

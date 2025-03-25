@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Examples - MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .interactive-example {
+            background-color: #f5f7fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .example-code {
+            background-color: #f1f1f1;
+            border-left: 4px solid #0076a8;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .example-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .run-code-btn {
+            background-color: #0076a8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .run-code-btn:hover {
+            background-color: #005a80;
+        }
+        
+        .example-output {
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .matlab-output {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #f8f8f8;
+            padding: 10px;
+            margin: 0;
+            white-space: pre-wrap;
+            color: #333;
+        }
+        
+        .output-image {
+            max-width: 100%;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .tab-button.active {
+            background-color: #0076a8;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 0 0 4px 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html">Functions</a></li>
+                <li><a href="examples.html" class="active">Interactive Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="intro">
+                <h2>Interactive MATLAB Examples</h2>
+                <p>This page contains interactive examples that demonstrate key concepts in computational engineering using MATLAB. Each example includes code that you can run to see the output, helping you understand how MATLAB implements various numerical methods and algorithms.</p>
+                <p>Click the "Run Code" button to see the simulated output for each example. You can also copy the code to try it in your own MATLAB environment.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Numerical Methods Examples</h3>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button" data-target="euler-tab">Euler's Method</button>
+                        <button class="tab-button" data-target="heun-tab">Heun's Method</button>
+                        <button class="tab-button" data-target="newton-tab">Newton-Raphson Method</button>
+                    </div>
+                    
+                    <div id="euler-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Solving a First-Order ODE with Euler's Method</h4>
+                            <p>This example solves the differential equation \(y' = -2y\) with initial condition \(y(0) = 1\) using Euler's method. The exact solution is \(y(t) = e^{-2t}\).</p>
+                            
+                            <div class="example-code">
+<pre><code>% Solve y' = -2y, y(0) = 1 using Euler's method
+% Define parameters
+f = @(t, y) -2*y;  % The differential equation
+t0 = 0;            % Initial time
+y0 = 1;            % Initial condition
+h = 0.1;           % Step size
+t_final = 1;       % Final time
+
+% Calculate number of steps
+n_steps = ceil((t_final - t0) / h);
+
+% Initialize arrays
+t = zeros(n_steps + 1, 1);
+y_euler = zeros(n_steps + 1, 1);
+y_exact = zeros(n_steps + 1, 1);
+
+% Set initial values
+t(1) = t0;
+y_euler(1) = y0;
+y_exact(1) = y0;
+
+% Euler's method iteration
+for i = 1:n_steps
+    % Update time
+    t(i+1) = t(i) + h;
+    
+    % Euler step: y_{n+1} = y_n + h*f(t_n, y_n)
+    y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    
+    % Compute exact solution for comparison
+    y_exact(i+1) = exp(-2*t(i+1));
+end
+
+% Calculate error
+error = abs(y_euler - y_exact);
+max_error = max(error);
+
+% Display results
+fprintf('Initial value problem: y'' = -2y, y(0) = 1\n');
+fprintf('Exact solution: y = exp(-2t)\n\n');
+fprintf('Step size: %.1f\n', h);
+
+for i = 1:n_steps+1
+    if i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == n_steps+1
+        fprintf('t = %.1f, y_euler = %.4f, y_exact = %.4f, error = %.4e\n', ...
+                t(i), y_euler(i), y_exact(i), error(i));
+        if i == 6
+            fprintf('...\n');
+        end
+    end
+end
+
+fprintf('\nGlobal error (maximum): %.4e\n', max_error);
+
+% Plot results
+figure;
+plot(t, y_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+plot(t, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Solution of y'' = -2y, y(0) = 1');
+legend('show');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="euler-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="euler-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Comparing Different Step Sizes</h4>
+                            <p>This example demonstrates how the accuracy of Euler's method improves with smaller step sizes by solving the same differential equation with different step sizes.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Compare Euler's method with different step sizes
+% Solve y' = -2y, y(0) = 1
+
+% Define parameters
+f = @(t, y) -2*y;  % The differential equation
+t0 = 0;            % Initial time
+y0 = 1;            % Initial condition
+t_final = 1;       % Final time
+
+% Define different step sizes
+step_sizes = [0.2, 0.1, 0.05, 0.025];
+colors = {'b', 'g', 'm', 'c'};
+
+% Initialize figure
+figure;
+hold on;
+
+% Loop through different step sizes
+for j = 1:length(step_sizes)
+    h = step_sizes(j);
+    
+    % Calculate number of steps
+    n_steps = ceil((t_final - t0) / h);
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    y_euler = zeros(n_steps + 1, 1);
+    
+    % Set initial values
+    t(1) = t0;
+    y_euler(1) = y0;
+    
+    % Euler's method iteration
+    for i = 1:n_steps
+        % Update time
+        t(i+1) = t(i) + h;
+        
+        % Euler step
+        y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    end
+    
+    % Plot results for this step size
+    plot(t, y_euler, [colors{j}, '-o'], 'LineWidth', 1.5, ...
+         'DisplayName', ['h = ', num2str(h)]);
+    
+    % Calculate error at final time
+    exact_final = exp(-2*t_final);
+    error_final = abs(y_euler(end) - exact_final);
+    fprintf('Step size h = %.3f, Final error = %.6e\n', h, error_final);
+end
+
+% Plot exact solution
+t_exact = linspace(t0, t_final, 100);
+y_exact = exp(-2*t_exact);
+plot(t_exact, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+
+% Add labels and legend
+xlabel('t');
+ylabel('y');
+title('Euler''s Method with Different Step Sizes');
+legend('show');
+grid on;
+
+% Create error convergence plot
+figure;
+errors = zeros(length(step_sizes), 1);
+for j = 1:length(step_sizes)
+    h = step_sizes(j);
+    n_steps = ceil((t_final - t0) / h);
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    y_euler = zeros(n_steps + 1, 1);
+    
+    % Set initial values
+    t(1) = t0;
+    y_euler(1) = y0;
+    
+    % Euler's method iteration
+    for i = 1:n_steps
+        t(i+1) = t(i) + h;
+        y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    end
+    
+    % Calculate error at final time
+    exact_final = exp(-2*t_final);
+    errors(j) = abs(y_euler(end) - exact_final);
+end
+
+% Plot error vs step size on log-log scale
+loglog(step_sizes, errors, 'bo-', 'LineWidth', 1.5);
+hold on;
+
+% Plot reference line with slope 1 (first-order convergence)
+h_ref = logspace(log10(min(step_sizes)), log10(max(step_sizes)), 100);
+err_ref = h_ref * (errors(end) / step_sizes(end));
+loglog(h_ref, err_ref, 'r--', 'LineWidth', 1.5, 'DisplayName', 'First-order (slope = 1)');
+
+xlabel('Step Size (h)');
+ylabel('Error at t = 1');
+title('Error Convergence of Euler''s Method');
+legend('Error', 'First-order reference', 'Location', 'northwest');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="euler-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="euler-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="heun-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Solving a First-Order ODE with Heun's Method</h4>
+                            <p>This example solves the differential equation \(y' = y - t^2 + 1\) with initial condition \(y(0) = 0.5\) using Heun's method. The exact solution is \(y(t) = (t + 1)^2 - 0.5e^t\).</p>
+                            
+                            <div class="example-code">
+<pre><code>% Solve y' = y - t^2 + 1, y(0) = 0.5 using Heun's method
+% Define parameters
+f = @(t, y) y - t^2 + 1;  % The differential equation
+t0 = 0;                   % Initial time
+y0 = 0.5;                 % Initial condition
+h = 0.1;                  % Step size
+t_final = 1;              % Final time
+
+% Calculate number of steps
+n_steps = ceil((t_final - t0) / h);
+
+% Initialize arrays
+t = zeros(n_steps + 1, 1);
+y_heun = zeros(n_steps + 1, 1);
+y_exact = zeros(n_steps + 1, 1);
+
+% Set initial values
+t(1) = t0;
+y_heun(1) = y0;
+y_exact(1) = y0;
+
+% Heun's method iteration
+for i = 1:n_steps
+    % Update time
+    t(i+1) = t(i) + h;
+    
+    % Predictor step (Euler)
+    y_pred = y_heun(i) + h * f(t(i), y_heun(i));
+    
+    % Corrector step (Trapezoidal)
+    y_heun(i+1) = y_heun(i) + h/2 * (f(t(i), y_heun(i)) + f(t(i+1), y_pred));
+    
+    % Compute exact solution for comparison
+    y_exact(i+1) = (t(i+1) + 1)^2 - 0.5*exp(t(i+1));
+end
+
+% Calculate error
+error = abs(y_heun - y_exact);
+max_error = max(error);
+
+% Display results
+fprintf('Initial value problem: y'' = y - t^2 + 1, y(0) = 0.5\n');
+fprintf('Exact solution: y = (t + 1)^2 - 0.5*exp(t)\n\n');
+fprintf('Step size: %.1f\n', h);
+
+for i = 1:n_steps+1
+    if i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == n_steps+1
+        fprintf('t = %.1f, y_heun = %.4f, y_exact = %.4f, error = %.4e\n', ...
+                t(i), y_heun(i), y_exact(i), error(i));
+        if i == 6
+            fprintf('...\n');
+        end
+    end
+end
+
+fprintf('\nGlobal error (maximum): %.4e\n', max_error);
+
+% Plot results
+figure;
+plot(t, y_heun, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Heun');
+hold on;
+plot(t, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Solution of y'' = y - t^2 + 1, y(0) = 0.5');
+legend('show');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="heun-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="heun-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Comparing Euler's and Heun's Methods</h4>
+                            <p>This example compares the accuracy of Euler's method and Heun's method for solving the same differential equation.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Compare Euler's and Heun's methods
+% Solve y' = y - t^2 + 1, y(0) = 0.5
+
+% Define parameters
+f = @(t, y) y - t^2 + 1;  % The differential equation
+t0 = 0;                   % Initial time
+y0 = 0.5;                 % Initial condition
+h = 0.1;                  % Step size
+t_final = 1;              % Final time
+
+% Calculate number of steps
+n_steps = ceil((t_final - t0) / h);
+
+% Initialize arrays
+t = zeros(n_steps + 1, 1);
+y_euler = zeros(n_steps + 1, 1);
+y_heun = zeros(n_steps + 1, 1);
+y_exact = zeros(n_steps + 1, 1);
+
+% Set initial values
+t(1) = t0;
+y_euler(1) = y0;
+y_heun(1) = y0;
+y_exact(1) = y0;
+
+% Iteration for both methods
+for i = 1:n_steps
+    % Update time
+    t(i+1) = t(i) + h;
+    
+    % Euler's method
+    y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    
+    % Heun's method
+    y_pred = y_heun(i) + h * f(t(i), y_heun(i));
+    y_heun(i+1) = y_heun(i) + h/2 * (f(t(i), y_heun(i)) + f(t(i+1), y_pred));
+    
+    % Compute exact solution
+    y_exact(i+1) = (t(i+1) + 1)^2 - 0.5*exp(t(i+1));
+end
+
+% Calculate errors
+error_euler = abs(y_euler - y_exact);
+error_heun = abs(y_heun - y_exact);
+max_error_euler = max(error_euler);
+max_error_heun = max(error_heun);
+
+% Display results
+fprintf('Comparison of Euler''s and Heun''s methods\n');
+fprintf('Step size: %.1f\n\n', h);
+fprintf('Method\t\tMax Error\tOrder\n');
+fprintf('Euler\t\t%.4e\t1\n', max_error_euler);
+fprintf('Heun\t\t%.4e\t2\n', max_error_heun);
+fprintf('Improvement: %.2f times\n', max_error_euler/max_error_heun);
+
+% Plot results
+figure;
+plot(t, y_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+plot(t, y_heun, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Heun');
+plot(t, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Comparison of Euler''s and Heun''s Methods');
+legend('show');
+grid on;
+
+% Plot errors
+figure;
+semilogy(t, error_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler Error');
+hold on;
+semilogy(t, error_heun, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Heun Error');
+xlabel('t');
+ylabel('Error (log scale)');
+title('Error Comparison of Euler''s and Heun''s Methods');
+legend('show');
+grid on;
+
+% Compare convergence rates
+step_sizes = [0.2, 0.1, 0.05, 0.025, 0.0125];
+errors_euler = zeros(length(step_sizes), 1);
+errors_heun = zeros(length(step_sizes), 1);
+
+for j = 1:length(step_sizes)
+    h_j = step_sizes(j);
+    n_steps_j = ceil((t_final - t0) / h_j);
+    
+    % Initialize arrays
+    t_j = zeros(n_steps_j + 1, 1);
+    y_euler_j = zeros(n_steps_j + 1, 1);
+    y_heun_j = zeros(n_steps_j + 1, 1);
+    
+    % Set initial values
+    t_j(1) = t0;
+    y_euler_j(1) = y0;
+    y_heun_j(1) = y0;
+    
+    % Iteration for both methods
+    for i = 1:n_steps_j
+        t_j(i+1) = t_j(i) + h_j;
+        
+        % Euler's method
+        y_euler_j(i+1) = y_euler_j(i) + h_j * f(t_j(i), y_euler_j(i));
+        
+        % Heun's method
+        y_pred_j = y_heun_j(i) + h_j * f(t_j(i), y_heun_j(i));
+        y_heun_j(i+1) = y_heun_j(i) + h_j/2 * (f(t_j(i), y_heun_j(i)) + f(t_j(i+1), y_pred_j));
+    end
+    
+    % Calculate errors at final time
+    exact_final = (t_final + 1)^2 - 0.5*exp(t_final);
+    errors_euler(j) = abs(y_euler_j(end) - exact_final);
+    errors_heun(j) = abs(y_heun_j(end) - exact_final);
+end
+
+% Plot convergence rates
+figure;
+loglog(step_sizes, errors_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+loglog(step_sizes, errors_heun, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Heun');
+
+% Add reference lines
+h_ref = logspace(log10(min(step_sizes)), log10(max(step_sizes)), 100);
+err_ref1 = h_ref * (errors_euler(end) / step_sizes(end));
+err_ref2 = h_ref.^2 * (errors_heun(end) / step_sizes(end)^2);
+loglog(h_ref, err_ref1, 'b--', 'LineWidth', 1, 'DisplayName', 'First-order');
+loglog(h_ref, err_ref2, 'g--', 'LineWidth', 1, 'DisplayName', 'Second-order');
+
+xlabel('Step Size (h)');
+ylabel('Error at t = 1');
+title('Convergence Rates of Euler''s and Heun''s Methods');
+legend('show');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="heun-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="heun-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="newton-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Finding Square Root Using Newton-Raphson Method</h4>
+                            <p>This example uses the Newton-Raphson method to compute the square root of 2 by finding the root of the equation \(f(x) = x^2 - 2 = 0\).</p>
+                            
+                            <div class="example-code">
+<pre><code>% Find square root of 2 using Newton-Raphson method
+a = 2;  % Find square root of 2
+
+% Define function and its derivative
+f = @(x) x^2 - a;
+df = @(x) 2*x;
+
+% Initial guess
+x0 = 1;
+
+% Apply Newton-Raphson method
+function [root, iterations, convergence] = newton_raphson(f, df, x0, tol, max_iter)
+    % Initialize variables
+    x = x0;
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check if derivative is close to zero
+        if abs(df_val) < eps
+            warning('Derivative close to zero. Method may not converge.');
+            df_val = sign(df_val) * eps;  % Avoid division by zero
+        end
+        
+        % Compute next approximation
+        x_next = x - f_val / df_val;
+        
+        % Store current approximation
+        convergence(i + 1) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end
+
+% Call the function
+[root, iterations, convergence] = newton_raphson(f, df, x0, 1e-10, 100);
+
+% Display results
+fprintf('Finding square root of %d using Newton-Raphson method\n\n', a);
+fprintf('Iteration\tApproximation\t\tError\n');
+fprintf('-------------------------------------------------\n');
+for i = 1:iterations+1
+    fprintf('%d\t\t%.10f\t\t%.2e\n', i-1, convergence(i), abs(convergence(i) - sqrt(a)));
+end
+
+fprintf('\nSquare root of %g found by Newton-Raphson: %.10f\n', a, root);
+fprintf('Actual square root: %.10f\n', sqrt(a));
+fprintf('Error: %.2e\n', abs(root - sqrt(a)));
+fprintf('Number of iterations: %d\n', iterations);
+
+% Plot convergence
+figure;
+semilogy(0:iterations, abs(convergence - sqrt(a)), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Newton-Raphson Method for Square Root');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="newton-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="newton-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Solving a System of Nonlinear Equations</h4>
+                            <p>This example uses the Newton-Raphson method to solve a system of nonlinear equations: \(x^2 + y^2 = 4\) and \(e^x - y = 1\).</p>
+                            
+                            <div class="example-code">
+<pre><code>% Solve a system of nonlinear equations using Newton-Raphson method
+% x^2 + y^2 = 4
+% e^x - y = 1
+
+% Define the system of equations
+F = @(x) [x(1)^2 + x(2)^2 - 4; exp(x(1)) - x(2) - 1];
+
+% Define the Jacobian matrix
+J = @(x) [2*x(1), 2*x(2); exp(x(1)), -1];
+
+% Initial guess
+x0 = [1; 1];
+
+% Apply Newton-Raphson method for systems
+function [x, iterations, convergence] = newton_raphson_system(F, J, x0, tol, max_iter)
+    % Initialize variables
+    x = x0(:);  % Ensure column vector
+    n = length(x);
+    convergence = cell(max_iter + 1, 1);
+    convergence{1} = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and Jacobian
+        F_val = F(x);
+        J_val = J(x);
+        
+        % Check if Jacobian is singular
+        if rcond(J_val) < eps
+            warning('Jacobian is nearly singular. Method may not converge.');
+            % Could use regularization or other techniques here
+        end
+        
+        % Solve linear system J(x) * dx = -F(x)
+        dx = J_val \ (-F_val);
+        
+        % Compute next approximation
+        x_next = x + dx;
+        
+        % Store current approximation
+        convergence{i + 1} = x_next;
+        
+        % Check for convergence
+        if norm(dx) < tol
+            x = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    iterations = max_iter;
+    convergence = convergence;
+end
+
+% Call the function
+[x, iterations, convergence] = newton_raphson_system(F, J, x0, 1e-10, 100);
+
+% Display results
+fprintf('Solution of nonlinear system using Newton-Raphson method:\n');
+fprintf('x = %.10f, y = %.10f\n', x(1), x(2));
+
+% Verify the solution
+F_val = F(x);
+fprintf('\nVerification (should be close to zero):\n');
+fprintf('Equation 1: x^2 + y^2 - 4 = %.2e\n', F_val(1));
+fprintf('Equation 2: e^x - y - 1 = %.2e\n', F_val(2));
+fprintf('Number of iterations: %d\n', iterations);
+
+% Plot the system and solution
+figure;
+% Create a grid of points
+[X, Y] = meshgrid(linspace(-3, 3, 100), linspace(-3, 3, 100));
+Z1 = X.^2 + Y.^2 - 4;
+Z2 = exp(X) - Y - 1;
+
+% Plot the contours
+contour(X, Y, Z1, [0, 0], 'b-', 'LineWidth', 2, 'DisplayName', 'x^2 + y^2 = 4');
+hold on;
+contour(X, Y, Z2, [0, 0], 'r-', 'LineWidth', 2, 'DisplayName', 'e^x - y = 1');
+
+% Mark the solution
+plot(x(1), x(2), 'go', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Solution');
+
+% Mark the initial guess
+plot(x0(1), x0(2), 'mo', 'MarkerSize', 8, 'LineWidth', 2, 'DisplayName', 'Initial Guess');
+
+% Plot the convergence path
+for i = 1:length(convergence)-1
+    x_i = convergence{i};
+    x_i_plus_1 = convergence{i+1};
+    plot([x_i(1), x_i_plus_1(1)], [x_i(2), x_i_plus_1(2)], 'k-o', 'LineWidth', 1);
+end
+
+xlabel('x');
+ylabel('y');
+title('Solution of Nonlinear System');
+legend('show');
+grid on;
+axis equal;
+
+% Plot convergence
+figure;
+errors = zeros(iterations, 1);
+for i = 1:iterations
+    errors(i) = norm([convergence{i+1}(1) - x(1); convergence{i+1}(2) - x(2)]);
+end
+
+semilogy(1:iterations, errors, 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error (norm)');
+title('Convergence of Newton-Raphson Method for Nonlinear System');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="newton-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="newton-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h3>MATLAB Fundamentals Examples</h3>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button" data-target="arrays-tab">Arrays and Vectors</button>
+                        <button class="tab-button" data-target="commands-tab">Common Commands</button>
+                        <button class="tab-button" data-target="functions-tab">Functions</button>
+                    </div>
+                    
+                    <div id="arrays-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Creating and Manipulating Arrays</h4>
+                            <p>This example demonstrates how to create, index, and manipulate arrays in MATLAB.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Creating and manipulating arrays in MATLAB
+
+% Create a 3x3 matrix
+A = [1, 2, 3; 4, 5, 6; 7, 8, 9]
+
+% Get the size of the matrix
+size(A)
+
+% Access a specific element
+A(2,3)  % Row 2, Column 3
+
+% Access an entire row
+A(2,:)
+
+% Access an entire column
+A(:,1)
+
+% Access a submatrix
+A(1:2,2:3)
+
+% Transpose the matrix
+B = A'
+
+% Matrix addition
+C = A + B
+
+% Matrix multiplication
+D = A * B</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="arrays-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="arrays-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Vectorized Operations</h4>
+                            <p>This example demonstrates the power of vectorized operations in MATLAB, which are much faster than using loops.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Vectorized operations in MATLAB
+
+% Create a vector using linspace
+x = linspace(0, 2*pi, 100);
+
+% Compute sine and cosine using vectorized operations
+y_sin = sin(x);
+y_cos = cos(x);
+
+% Plot the results
+figure;
+plot(x, y_sin, 'b-', 'LineWidth', 1.5, 'DisplayName', 'sin(x)');
+hold on;
+plot(x, y_cos, 'r-', 'LineWidth', 1.5, 'DisplayName', 'cos(x)');
+xlabel('x');
+ylabel('y');
+title('Sine and Cosine Functions');
+legend('show');
+grid on;
+
+% Element-wise operations
+a = 1:5;
+b = 6:10;
+
+% Element-wise multiplication
+c = a .* b
+
+% Element-wise division
+d = a ./ b
+
+% Element-wise power
+e = a .^ 2
+
+% Compare performance: vectorized vs. loop
+n = 1000000;
+x = rand(1, n);
+y = zeros(1, n);
+
+% Using a loop
+tic
+for i = 1:n
+    y(i) = sin(x(i));
+end
+loop_time = toc;
+fprintf('Time using loop: %.6f seconds\n', loop_time);
+
+% Using vectorized operation
+tic
+y = sin(x);
+vectorized_time = toc;
+fprintf('Time using vectorized operation: %.6f seconds\n', vectorized_time);
+fprintf('Speedup factor: %.2f times faster\n', loop_time/vectorized_time);</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="arrays-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="arrays-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="commands-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Common MATLAB Commands</h4>
+                            <p>This example demonstrates some of the most commonly used MATLAB commands for creating and manipulating arrays.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Common MATLAB commands
+
+% Create arrays using zeros, ones, and eye
+z = zeros(3, 4)  % 3x4 matrix of zeros
+o = ones(2, 3)   % 2x3 matrix of ones
+i = eye(3)       % 3x3 identity matrix
+
+% Create arrays using linspace and logspace
+x_lin = linspace(0, 10, 5)  % 5 points evenly spaced from 0 to 10
+x_log = logspace(0, 2, 5)   % 5 points logarithmically spaced from 10^0 to 10^2
+
+% Get size and length of arrays
+A = rand(3, 4);
+size_A = size(A)
+rows_A = size(A, 1)
+cols_A = size(A, 2)
+len_A = length(A)  % Length of the longest dimension
+
+% Create a vector
+v = 1:2:10  % From 1 to 10 with step 2
+
+% Find elements that satisfy a condition
+indices = find(v > 5)
+values = v(indices)
+
+% Sort arrays
+unsorted = [5, 2, 8, 1, 9];
+sorted_asc = sort(unsorted)
+sorted_desc = sort(unsorted, 'descend')
+
+% Statistical functions
+data = [12, 15, 18, 22, 30, 35, 42];
+mean_val = mean(data)
+median_val = median(data)
+std_val = std(data)
+min_val = min(data)
+max_val = max(data)
+sum_val = sum(data)
+
+% Generate random numbers
+rand_uniform = rand(1, 5)  % Uniform distribution [0, 1]
+rand_normal = randn(1, 5)  % Normal distribution (mean 0, std 1)
+
+% Reshape arrays
+A = 1:12;
+B = reshape(A, 3, 4)
+C = reshape(A, 4, 3)
+
+% Concatenate arrays
+D = [B; ones(1, 4)]  % Vertical concatenation
+E = [C, zeros(4, 1)]  % Horizontal concatenation</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="commands-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="commands-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Data Analysis Commands</h4>
+                            <p>This example demonstrates MATLAB commands commonly used for data analysis and visualization.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Data analysis commands in MATLAB
+
+% Generate sample data
+n = 100;
+x = linspace(0, 10, n);
+y_true = 2*x + 3;
+noise = randn(1, n);
+y_noisy = y_true + noise;
+
+% Plot the data
+figure;
+plot(x, y_noisy, 'bo', 'DisplayName', 'Noisy data');
+hold on;
+plot(x, y_true, 'r-', 'LineWidth', 1.5, 'DisplayName', 'True line');
+xlabel('x');
+ylabel('y');
+title('Linear Data with Noise');
+legend('show');
+grid on;
+
+% Compute correlation coefficient
+corr_coef = corrcoef(x, y_noisy);
+fprintf('Correlation coefficient: %.4f\n', corr_coef(1,2));
+
+% Linear regression using polyfit
+p = polyfit(x, y_noisy, 1);  % Fit a first-degree polynomial (line)
+y_fit = polyval(p, x);
+fprintf('Linear fit: y = %.4f*x + %.4f\n', p(1), p(2));
+
+% Add the fitted line to the plot
+plot(x, y_fit, 'g--', 'LineWidth', 1.5, 'DisplayName', 'Fitted line');
+legend('show');
+
+% Compute residuals
+residuals = y_noisy - y_fit;
+
+% Plot residuals
+figure;
+plot(x, residuals, 'bo');
+hold on;
+plot(x, zeros(size(x)), 'r-');
+xlabel('x');
+ylabel('Residual');
+title('Residuals of Linear Fit');
+grid on;
+
+% Compute statistics of residuals
+mean_residual = mean(residuals);
+std_residual = std(residuals);
+fprintf('Mean of residuals: %.4f\n', mean_residual);
+fprintf('Standard deviation of residuals: %.4f\n', std_residual);
+
+% Histogram of residuals
+figure;
+histogram(residuals, 20, 'Normalization', 'probability');
+hold on;
+
+% Add normal distribution curve
+x_norm = linspace(min(residuals), max(residuals), 100);
+y_norm = normpdf(x_norm, mean_residual, std_residual);
+plot(x_norm, y_norm, 'r-', 'LineWidth', 1.5);
+
+xlabel('Residual');
+ylabel('Probability');
+title('Histogram of Residuals with Normal Distribution');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="commands-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="commands-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="functions-tab" class="tab-content">
+                        <div class="interactive-example">
+                            <h4>Example 1: Creating and Using Functions</h4>
+                            <p>This example demonstrates how to create and use functions in MATLAB for solving ODEs.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Creating and using functions in MATLAB
+
+% Define a function to solve an ODE using Euler's method
+function [t, y] = solve_ode(f, t0, t_final, h, y0)
+    % SOLVE_ODE Solve an ODE using Euler's method
+    %   [T, Y] = SOLVE_ODE(F, T0, T_FINAL, H, Y0) solves the ODE y' = F(t,y)
+    %   with initial condition Y0 at time T0 until time T_FINAL using step size H.
+    %
+    %   Inputs:
+    %       F - Function handle for the right-hand side of the ODE
+    %       T0 - Initial time
+    %       T_FINAL - Final time
+    %       H - Step size
+    %       Y0 - Initial condition
+    %
+    %   Outputs:
+    %       T - Vector of time points
+    %       Y - Vector of solution values
+    
+    % Calculate number of steps
+    n_steps = ceil((t_final - t0) / h);
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    y = zeros(n_steps + 1, 1);
+    
+    % Set initial values
+    t(1) = t0;
+    y(1) = y0;
+    
+    % Euler's method iteration
+    for i = 1:n_steps
+        % Update time
+        t(i+1) = t(i) + h;
+        
+        % Euler step
+        y(i+1) = y(i) + h * f(t(i), y(i));
+    end
+end
+
+% Use the function to solve y' = -2y, y(0) = 1
+f = @(t, y) -2*y;
+[t, y] = solve_ode(f, 0, 1, 0.1, 1);
+
+% Display results
+disp('Solution of y'' = -2y, y(0) = 1:');
+disp([t, y]);
+
+% Compare with exact solution
+exact = exp(-2*t);
+error = abs(y - exact);
+max_error = max(error);
+fprintf('Maximum error: %.4e\n', max_error);
+
+% Plot results
+figure;
+plot(t, y, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Numerical');
+hold on;
+plot(t, exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Solution of y'' = -2y, y(0) = 1');
+legend('show');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="functions-example1">Run Code</button>
+                            </div>
+                            
+                            <div id="functions-example1-output" class="example-output"></div>
+                        </div>
+                        
+                        <div class="interactive-example">
+                            <h4>Example 2: Anonymous Functions and Function Handles</h4>
+                            <p>This example demonstrates the use of anonymous functions and function handles in MATLAB.</p>
+                            
+                            <div class="example-code">
+<pre><code>% Anonymous functions and function handles in MATLAB
+
+% Create anonymous functions
+f1 = @(x) x^2;
+f2 = @(x) sin(x);
+f3 = @(x, y) x*y + y^2;
+
+% Use anonymous functions
+result1 = f1(3);
+result2 = f2(pi/2);
+result3 = f3(2, 3);
+
+fprintf('f1(3) = %.2f\n', result1);
+fprintf('f2(pi/2) = %.2f\n', result2);
+fprintf('f3(2, 3) = %.2f\n', result3);
+
+% Function handles as arguments
+function y = apply_function(f, x)
+    % Apply a function to a value
+    y = f(x);
+end
+
+% Use apply_function with different function handles
+result4 = apply_function(@(x) x^2, 4);
+result5 = apply_function(@(x) exp(x), 2);
+result6 = apply_function(@sin, pi);
+
+fprintf('apply_function(@(x) x^2, 4) = %.2f\n', result4);
+fprintf('apply_function(@(x) exp(x), 2) = %.2f\n', result5);
+fprintf('apply_function(@sin, pi) = %.2f\n', result6);
+
+% Function handles for numerical methods
+function result = integrate_function(f, a, b, n)
+    % Integrate a function using the trapezoidal rule
+    h = (b - a) / n;
+    x = a:h:b;
+    y = arrayfun(f, x);
+    result = h * (sum(y) - 0.5*(y(1) + y(end)));
+end
+
+% Integrate different functions
+int1 = integrate_function(@(x) x^2, 0, 1, 100);
+int2 = integrate_function(@(x) sin(x), 0, pi, 100);
+int3 = integrate_function(@(x) exp(-x^2), -1, 1, 100);
+
+fprintf('∫x^2 dx from 0 to 1 ≈ %.6f (exact: 1/3 ≈ 0.333333)\n', int1);
+fprintf('∫sin(x) dx from 0 to pi ≈ %.6f (exact: 2)\n', int2);
+fprintf('∫exp(-x^2) dx from -1 to 1 ≈ %.6f\n', int3);
+
+% Array of function handles
+functions = {@(x) x^2, @(x) x^3, @(x) exp(x), @(x) sin(x)};
+function_names = {'x^2', 'x^3', 'exp(x)', 'sin(x)'};
+
+% Evaluate all functions at a point
+x_val = 2;
+fprintf('\nEvaluating functions at x = %d:\n', x_val);
+for i = 1:length(functions)
+    fprintf('%s = %.4f\n', function_names{i}, functions{i}(x_val));
+end
+
+% Plot all functions
+figure;
+x = linspace(0, 2, 100);
+for i = 1:length(functions)
+    y = arrayfun(functions{i}, x);
+    plot(x, y, 'LineWidth', 1.5, 'DisplayName', function_names{i});
+    hold on;
+end
+xlabel('x');
+ylabel('y');
+title('Various Functions');
+legend('show');
+grid on;</code></pre>
+                            </div>
+                            
+                            <div class="example-controls">
+                                <button class="run-code-btn" data-example="functions-example2">Run Code</button>
+                            </div>
+                            
+                            <div id="functions-example2-output" class="example-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h3>Interactive Challenges</h3>
+                
+                <div class="interactive-example">
+                    <h4>Challenge 1: Implement the Improved Euler Method</h4>
+                    <p>The improved Euler method (also known as the Heun's method) is a second-order numerical method for solving ODEs. Your challenge is to implement this method and compare it with the standard Euler method.</p>
+                    
+                    <div class="example-code">
+<pre><code>% Challenge: Implement the Improved Euler Method
+% Solve y' = y, y(0) = 1 using both methods and compare
+
+% Define the ODE
+f = @(t, y) y;  % y' = y
+t0 = 0;         % Initial time
+y0 = 1;         % Initial condition
+t_final = 1;    % Final time
+h = 0.1;        % Step size
+
+% Calculate number of steps
+n_steps = ceil((t_final - t0) / h);
+
+% Initialize arrays
+t = zeros(n_steps + 1, 1);
+y_euler = zeros(n_steps + 1, 1);
+y_improved = zeros(n_steps + 1, 1);
+y_exact = zeros(n_steps + 1, 1);
+
+% Set initial values
+t(1) = t0;
+y_euler(1) = y0;
+y_improved(1) = y0;
+y_exact(1) = y0;
+
+% TODO: Implement both methods
+% Standard Euler method
+for i = 1:n_steps
+    % Update time
+    t(i+1) = t(i) + h;
+    
+    % Euler step
+    y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    
+    % TODO: Implement improved Euler method (Heun's method)
+    % Hint: Use a predictor-corrector approach
+    % 1. Compute a predicted value using Euler's method
+    % 2. Use the predicted value to compute a more accurate slope
+    % 3. Use the average of the initial and predicted slopes for the final step
+    
+    % Compute exact solution for comparison
+    y_exact(i+1) = exp(t(i+1));
+end
+
+% Calculate errors
+error_euler = abs(y_euler - y_exact);
+error_improved = abs(y_improved - y_exact);
+max_error_euler = max(error_euler);
+max_error_improved = max(error_improved);
+
+% Display results
+fprintf('Comparison of Euler and Improved Euler methods\n');
+fprintf('Step size: %.1f\n\n', h);
+fprintf('Method\t\tMax Error\tOrder\n');
+fprintf('Euler\t\t%.4e\t1\n', max_error_euler);
+fprintf('Improved\t%.4e\t2\n', max_error_improved);
+fprintf('Improvement: %.2f times\n', max_error_euler/max_error_improved);
+
+% Plot results
+figure;
+plot(t, y_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+plot(t, y_improved, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Improved Euler');
+plot(t, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Comparison of Euler and Improved Euler Methods');
+legend('show');
+grid on;</code></pre>
+                    </div>
+                    
+                    <button id="challenge1-btn" class="btn">Show Solution</button>
+                    
+                    <div id="challenge1-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Solution to Challenge: Implement the Improved Euler Method
+% Solve y' = y, y(0) = 1 using both methods and compare
+
+% Define the ODE
+f = @(t, y) y;  % y' = y
+t0 = 0;         % Initial time
+y0 = 1;         % Initial condition
+t_final = 1;    % Final time
+h = 0.1;        % Step size
+
+% Calculate number of steps
+n_steps = ceil((t_final - t0) / h);
+
+% Initialize arrays
+t = zeros(n_steps + 1, 1);
+y_euler = zeros(n_steps + 1, 1);
+y_improved = zeros(n_steps + 1, 1);
+y_exact = zeros(n_steps + 1, 1);
+
+% Set initial values
+t(1) = t0;
+y_euler(1) = y0;
+y_improved(1) = y0;
+y_exact(1) = y0;
+
+% Implement both methods
+for i = 1:n_steps
+    % Update time
+    t(i+1) = t(i) + h;
+    
+    % Euler step
+    y_euler(i+1) = y_euler(i) + h * f(t(i), y_euler(i));
+    
+    % Improved Euler method (Heun's method)
+    % 1. Predictor step (Euler)
+    y_pred = y_improved(i) + h * f(t(i), y_improved(i));
+    
+    % 2. Corrector step (Trapezoidal)
+    y_improved(i+1) = y_improved(i) + h/2 * (f(t(i), y_improved(i)) + f(t(i+1), y_pred));
+    
+    % Compute exact solution for comparison
+    y_exact(i+1) = exp(t(i+1));
+end
+
+% Calculate errors
+error_euler = abs(y_euler - y_exact);
+error_improved = abs(y_improved - y_exact);
+max_error_euler = max(error_euler);
+max_error_improved = max(error_improved);
+
+% Display results
+fprintf('Comparison of Euler and Improved Euler methods\n');
+fprintf('Step size: %.1f\n\n', h);
+fprintf('Method\t\tMax Error\tOrder\n');
+fprintf('Euler\t\t%.4e\t1\n', max_error_euler);
+fprintf('Improved\t%.4e\t2\n', max_error_improved);
+fprintf('Improvement: %.2f times\n', max_error_euler/max_error_improved);
+
+% Plot results
+figure;
+plot(t, y_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+plot(t, y_improved, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Improved Euler');
+plot(t, y_exact, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Comparison of Euler and Improved Euler Methods');
+legend('show');
+grid on;
+
+% Plot errors
+figure;
+semilogy(t, error_euler, 'b-o', 'LineWidth', 1.5, 'DisplayName', 'Euler Error');
+hold on;
+semilogy(t, error_improved, 'g-s', 'LineWidth', 1.5, 'DisplayName', 'Improved Euler Error');
+xlabel('t');
+ylabel('Error (log scale)');
+title('Error Comparison of Euler and Improved Euler Methods');
+legend('show');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h4>Challenge 2: Implement the Newton-Raphson Method for Finding Roots</h4>
+                    <p>Implement the Newton-Raphson method to find the root of a nonlinear equation.</p>
+                    
+                    <div class="example-code">
+<pre><code>% Challenge: Implement the Newton-Raphson Method
+% Find the root of f(x) = x^3 - 2*x - 5
+
+% Define the function and its derivative
+f = @(x) x^3 - 2*x - 5;
+df = @(x) 3*x^2 - 2;
+
+% Initial guess
+x0 = 2;
+
+% Tolerance and maximum iterations
+tol = 1e-10;
+max_iter = 100;
+
+% TODO: Implement the Newton-Raphson method
+% 1. Initialize variables
+% 2. Iterate until convergence or maximum iterations
+%    a. Compute function value and derivative
+%    b. Compute next approximation using Newton-Raphson formula
+%    c. Check for convergence
+%    d. Update current approximation
+
+% Display results
+fprintf('Root found: %.10f\n', root);
+fprintf('Function value at root: %.2e\n', f(root));
+fprintf('Number of iterations: %d\n', iterations);
+
+% Plot convergence
+figure;
+semilogy(0:iterations, abs(convergence - root), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Newton-Raphson Method');
+grid on;</code></pre>
+                    </div>
+                    
+                    <button id="challenge2-btn" class="btn">Show Solution</button>
+                    
+                    <div id="challenge2-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Solution to Challenge: Implement the Newton-Raphson Method
+% Find the root of f(x) = x^3 - 2*x - 5
+
+% Define the function and its derivative
+f = @(x) x^3 - 2*x - 5;
+df = @(x) 3*x^2 - 2;
+
+% Initial guess
+x0 = 2;
+
+% Tolerance and maximum iterations
+tol = 1e-10;
+max_iter = 100;
+
+% Implement the Newton-Raphson method
+% 1. Initialize variables
+x = x0;
+convergence = zeros(max_iter + 1, 1);
+convergence(1) = x;
+
+% 2. Iterate until convergence or maximum iterations
+for i = 1:max_iter
+    % a. Compute function value and derivative
+    f_val = f(x);
+    df_val = df(x);
+    
+    % Check if derivative is close to zero
+    if abs(df_val) < eps
+        warning('Derivative close to zero. Method may not converge.');
+        df_val = sign(df_val) * eps;  % Avoid division by zero
+    end
+    
+    % b. Compute next approximation using Newton-Raphson formula
+    x_next = x - f_val / df_val;
+    
+    % Store current approximation
+    convergence(i + 1) = x_next;
+    
+    % c. Check for convergence
+    if abs(x_next - x) < tol
+        root = x_next;
+        iterations = i;
+        convergence = convergence(1:i + 1);
+        break;
+    end
+    
+    % d. Update current approximation
+    x = x_next;
+    
+    % If reached maximum iterations without converging
+    if i == max_iter
+        warning('Maximum iterations reached. Method may not have converged.');
+        root = x;
+        iterations = max_iter;
+        convergence = convergence;
+    end
+end
+
+% Display results
+fprintf('Root found: %.10f\n', root);
+fprintf('Function value at root: %.2e\n', f(root));
+fprintf('Number of iterations: %d\n', iterations);
+
+% Plot convergence
+figure;
+semilogy(0:iterations, abs(convergence - root), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Newton-Raphson Method');
+grid on;
+
+% Plot the function and root
+figure;
+x_plot = linspace(root-2, root+2, 100);
+y_plot = f(x_plot);
+plot(x_plot, y_plot, 'b-', 'LineWidth', 1.5);
+hold on;
+plot(x_plot, zeros(size(x_plot)), 'k--');
+plot(root, 0, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
+xlabel('x');
+ylabel('f(x)');
+title('Function f(x) = x^3 - 2x - 5 and its Root');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+    <script src="js/interactive.js"></script>
+</body>
+</html>

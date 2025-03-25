@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newton-Raphson Method - MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn active">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html" class="active">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html">Functions</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="intro">
+                <h2>Newton-Raphson Method</h2>
+                <p>The Newton-Raphson method (often simply called Newton's method) is a powerful iterative technique for finding roots of equations. Unlike Euler's and Heun's methods, which solve initial value problems for differential equations, the Newton-Raphson method solves nonlinear equations of the form \(f(x) = 0\).</p>
+                
+                <p>In this guide, we'll explore the mathematical principles behind the Newton-Raphson method, implement it in MATLAB, analyze its convergence properties, and apply it to solve practical engineering problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Mathematical Foundation</h3>
+                
+                <h4>The Basic Concept</h4>
+                <p>The Newton-Raphson method is based on the idea of linear approximation. Given a function \(f(x)\), we want to find a value \(x^*\) such that \(f(x^*) = 0\). The method starts with an initial guess \(x_0\) and iteratively improves this guess using the formula:</p>
+                
+                <div class="equation">
+                    \[ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)} \]
+                </div>
+                
+                <p>where \(f'(x_n)\) is the derivative of \(f\) evaluated at \(x_n\).</p>
+                
+                <h4>Geometric Interpretation</h4>
+                <p>Geometrically, the Newton-Raphson method can be interpreted as follows:</p>
+                <ol>
+                    <li>At the current approximation \(x_n\), compute the tangent line to the curve \(y = f(x)\)</li>
+                    <li>Find the x-intercept of this tangent line, which gives the next approximation \(x_{n+1}\)</li>
+                    <li>Repeat until convergence</li>
+                </ol>
+                
+                <p>The equation of the tangent line at \((x_n, f(x_n))\) is:</p>
+                
+                <div class="equation">
+                    \[ y - f(x_n) = f'(x_n)(x - x_n) \]
+                </div>
+                
+                <p>Setting \(y = 0\) (to find the x-intercept) and solving for \(x\) gives:</p>
+                
+                <div class="equation">
+                    \[ x = x_n - \frac{f(x_n)}{f'(x_n)} \]
+                </div>
+                
+                <p>which is exactly the Newton-Raphson formula.</p>
+                
+                <h4>Derivation from Taylor Series</h4>
+                <p>The Newton-Raphson method can also be derived using Taylor series. The first-order Taylor expansion of \(f(x)\) around \(x_n\) is:</p>
+                
+                <div class="equation">
+                    \[ f(x) \approx f(x_n) + f'(x_n)(x - x_n) \]
+                </div>
+                
+                <p>If we want to find \(x\) such that \(f(x) = 0\), we set the right-hand side to zero:</p>
+                
+                <div class="equation">
+                    \[ f(x_n) + f'(x_n)(x - x_n) = 0 \]
+                </div>
+                
+                <p>Solving for \(x\) gives:</p>
+                
+                <div class="equation">
+                    \[ x = x_n - \frac{f(x_n)}{f'(x_n)} \]
+                </div>
+                
+                <p>This value of \(x\) becomes our next approximation \(x_{n+1}\).</p>
+                
+                <h4>Convergence Analysis</h4>
+                <p>The Newton-Raphson method typically exhibits quadratic convergence, which means that the error in each iteration is proportional to the square of the error in the previous iteration:</p>
+                
+                <div class="equation">
+                    \[ |x_{n+1} - x^*| \approx C |x_n - x^*|^2 \]
+                </div>
+                
+                <p>where \(C\) is a constant that depends on the second derivative of \(f\) at the root \(x^*\).</p>
+                
+                <p>This quadratic convergence makes the Newton-Raphson method very efficient when the initial guess is close to the root. However, the method may converge slowly or even diverge if:</p>
+                <ul>
+                    <li>The initial guess is far from the root</li>
+                    <li>The derivative \(f'(x)\) is close to zero near the root (leading to division by a small number)</li>
+                    <li>The function has multiple roots or points of inflection</li>
+                </ul>
+                
+                <h4>Conditions for Convergence</h4>
+                <p>For the Newton-Raphson method to converge to a root \(x^*\), the following conditions are generally required:</p>
+                <ol>
+                    <li>\(f(x^*) = 0\) (the root exists)</li>
+                    <li>\(f'(x^*) \neq 0\) (the derivative is non-zero at the root)</li>
+                    <li>\(f\) and \(f'\) are continuous near \(x^*\)</li>
+                    <li>The initial guess \(x_0\) is sufficiently close to \(x^*\)</li>
+                </ol>
+                
+                <p>If \(f'(x^*) = 0\) (a multiple root), the convergence becomes linear rather than quadratic.</p>
+                
+                <h4>Modified Newton-Raphson Method for Multiple Roots</h4>
+                <p>If \(f(x)\) has a root of multiplicity \(m\) at \(x^*\) (meaning \(f(x) = (x - x^*)^m g(x)\) where \(g(x^*) \neq 0\)), then the standard Newton-Raphson method converges linearly. A modified version can restore quadratic convergence:</p>
+                
+                <div class="equation">
+                    \[ x_{n+1} = x_n - m \frac{f(x_n)}{f'(x_n)} \]
+                </div>
+                
+                <p>If the multiplicity \(m\) is unknown, another modification is:</p>
+                
+                <div class="equation">
+                    \[ x_{n+1} = x_n - \frac{f(x_n) f'(x_n)}{(f'(x_n))^2 - f(x_n) f''(x_n)} \]
+                </div>
+                
+                <p>which automatically accounts for the multiplicity.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>MATLAB Implementation</h3>
+                
+                <h4>Basic Implementation</h4>
+                <p>Let's implement the Newton-Raphson method in MATLAB to find roots of nonlinear equations:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = newton_raphson(f, df, x0, tol, max_iter)
+    % NEWTON_RAPHSON Find root of equation f(x) = 0 using Newton-Raphson method
+    %   [ROOT, ITERATIONS, CONVERGENCE] = NEWTON_RAPHSON(F, DF, X0, TOL, MAX_ITER)
+    %   finds a root of the equation F(x) = 0 using the Newton-Raphson method.
+    %
+    %   Inputs:
+    %       F - Function handle for f(x)
+    %       DF - Function handle for f'(x)
+    %       X0 - Initial guess
+    %       TOL - Tolerance for convergence (default: 1e-6)
+    %       MAX_ITER - Maximum number of iterations (default: 100)
+    %
+    %   Outputs:
+    %       ROOT - Approximation of the root
+    %       ITERATIONS - Number of iterations performed
+    %       CONVERGENCE - Array of approximations at each iteration
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    % Initialize variables
+    x = x0;
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check if derivative is close to zero
+        if abs(df_val) < eps
+            warning('Derivative close to zero. Method may not converge.');
+            df_val = sign(df_val) * eps;  % Avoid division by zero
+        end
+        
+        % Compute next approximation
+        x_next = x - f_val / df_val;
+        
+        % Store current approximation
+        convergence(i + 1) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation follows the mathematical formula directly. Let's break down what's happening in the MATLAB code:</p>
+                
+                <ol>
+                    <li>We define a function that takes the function \(f(x)\), its derivative \(f'(x)\), an initial guess, a tolerance, and a maximum number of iterations as inputs.</li>
+                    <li>We initialize variables to store the current approximation and the convergence history.</li>
+                    <li>In the main loop, for each iteration:
+                        <ul>
+                            <li>We compute the function value \(f(x_n)\) and derivative \(f'(x_n)\) at the current approximation</li>
+                            <li>We check if the derivative is close to zero to avoid division by zero</li>
+                            <li>We compute the next approximation using the Newton-Raphson formula: \(x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}\)</li>
+                            <li>We check for convergence by comparing the change in the approximation with the tolerance</li>
+                            <li>If converged, we return the root, the number of iterations, and the convergence history</li>
+                            <li>Otherwise, we update the current approximation and continue</li>
+                        </ul>
+                    </li>
+                    <li>If the maximum number of iterations is reached without convergence, we issue a warning and return the current approximation.</li>
+                </ol>
+                
+                <h4>Using Numerical Derivatives</h4>
+                <p>In many practical situations, the derivative \(f'(x)\) may not be available analytically. In such cases, we can use numerical differentiation to approximate the derivative:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = newton_raphson_numerical(f, x0, tol, max_iter, h)
+    % NEWTON_RAPHSON_NUMERICAL Find root using Newton-Raphson with numerical derivatives
+    %   Uses central difference approximation for the derivative
+    
+    % Set default values for optional parameters
+    if nargin < 3
+        tol = 1e-6;
+    end
+    
+    if nargin < 4
+        max_iter = 100;
+    end
+    
+    if nargin < 5
+        h = 1e-6;  % Step size for numerical differentiation
+    end
+    
+    % Initialize variables
+    x = x0;
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value
+        f_val = f(x);
+        
+        % Compute derivative using central difference
+        df_val = (f(x + h) - f(x - h)) / (2 * h);
+        
+        % Check if derivative is close to zero
+        if abs(df_val) < eps
+            warning('Derivative close to zero. Method may not converge.');
+            df_val = sign(df_val) * eps;  % Avoid division by zero
+        end
+        
+        % Compute next approximation
+        x_next = x - f_val / df_val;
+        
+        % Store current approximation
+        convergence(i + 1) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses the central difference approximation for the derivative:</p>
+                
+                <div class="equation">
+                    \[ f'(x) \approx \frac{f(x + h) - f(x - h)}{2h} \]
+                </div>
+                
+                <p>where \(h\) is a small step size. The central difference approximation has an error of order \(O(h^2)\), which is more accurate than the forward difference approximation \(\frac{f(x + h) - f(x)}{h}\) with an error of order \(O(h)\).</p>
+                
+                <h4>Handling Systems of Nonlinear Equations</h4>
+                <p>The Newton-Raphson method can be extended to systems of nonlinear equations. For a system of \(n\) equations with \(n\) unknowns:</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    f_1(x_1, x_2, \ldots, x_n) &= 0 \\
+                    f_2(x_1, x_2, \ldots, x_n) &= 0 \\
+                    \vdots \\
+                    f_n(x_1, x_2, \ldots, x_n) &= 0
+                    \end{align} \]
+                </div>
+                
+                <p>We can define a vector-valued function \(\mathbf{F}(\mathbf{x}) = [f_1(\mathbf{x}), f_2(\mathbf{x}), \ldots, f_n(\mathbf{x})]^T\) and its Jacobian matrix \(\mathbf{J}(\mathbf{x})\) with elements \(J_{ij} = \frac{\partial f_i}{\partial x_j}\).</p>
+                
+                <p>The Newton-Raphson iteration for systems becomes:</p>
+                
+                <div class="equation">
+                    \[ \mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{J}(\mathbf{x}_k)^{-1} \mathbf{F}(\mathbf{x}_k) \]
+                </div>
+                
+                <p>In practice, we don't compute the inverse of the Jacobian directly. Instead, we solve the linear system:</p>
+                
+                <div class="equation">
+                    \[ \mathbf{J}(\mathbf{x}_k) \Delta \mathbf{x}_k = -\mathbf{F}(\mathbf{x}_k) \]
+                </div>
+                
+                <p>and then update:</p>
+                
+                <div class="equation">
+                    \[ \mathbf{x}_{k+1} = \mathbf{x}_k + \Delta \mathbf{x}_k \]
+                </div>
+                
+                <p>Here's a MATLAB implementation for systems of nonlinear equations:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [x, iterations, convergence] = newton_raphson_system(F, J, x0, tol, max_iter)
+    % NEWTON_RAPHSON_SYSTEM Solve system of nonlinear equations using Newton-Raphson
+    %   [X, ITERATIONS, CONVERGENCE] = NEWTON_RAPHSON_SYSTEM(F, J, X0, TOL, MAX_ITER)
+    %   solves the system of nonlinear equations F(x) = 0 using the Newton-Raphson method.
+    %
+    %   Inputs:
+    %       F - Function handle for F(x), returns a column vector
+    %       J - Function handle for the Jacobian matrix J(x)
+    %       X0 - Initial guess (column vector)
+    %       TOL - Tolerance for convergence (default: 1e-6)
+    %       MAX_ITER - Maximum number of iterations (default: 100)
+    %
+    %   Outputs:
+    %       X - Solution vector
+    %       ITERATIONS - Number of iterations performed
+    %       CONVERGENCE - Cell array of solution vectors at each iteration
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    % Initialize variables
+    x = x0(:);  % Ensure column vector
+    n = length(x);
+    convergence = cell(max_iter + 1, 1);
+    convergence{1} = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and Jacobian
+        F_val = F(x);
+        J_val = J(x);
+        
+        % Check if Jacobian is singular
+        if rcond(J_val) < eps
+            warning('Jacobian is nearly singular. Method may not converge.');
+            % Could use regularization or other techniques here
+        end
+        
+        % Solve linear system J(x) * dx = -F(x)
+        dx = J_val \ (-F_val);
+        
+        % Compute next approximation
+        x_next = x + dx;
+        
+        % Store current approximation
+        convergence{i + 1} = x_next;
+        
+        % Check for convergence
+        if norm(dx) < tol
+            x = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation handles systems of nonlinear equations by:</p>
+                <ol>
+                    <li>Taking function handles for the vector-valued function \(\mathbf{F}(\mathbf{x})\) and its Jacobian matrix \(\mathbf{J}(\mathbf{x})\)</li>
+                    <li>Solving the linear system \(\mathbf{J}(\mathbf{x}_k) \Delta \mathbf{x}_k = -\mathbf{F}(\mathbf{x}_k)\) using MATLAB's backslash operator</li>
+                    <li>Updating the approximation and checking for convergence based on the norm of the update vector</li>
+                </ol>
+                
+                <h4>Numerical Jacobian for Systems</h4>
+                <p>If the Jacobian is not available analytically, we can approximate it numerically using finite differences:</p>
+                
+                <div class="code-example">
+                    <pre><code>function J = numerical_jacobian(F, x, h)
+    % NUMERICAL_JACOBIAN Compute numerical approximation of Jacobian matrix
+    %   J = NUMERICAL_JACOBIAN(F, X, H) computes the Jacobian matrix of F at X
+    %   using finite differences with step size H.
+    
+    % Default step size
+    if nargin < 3
+        h = 1e-6;
+    end
+    
+    % Get dimension of the system
+    n = length(x);
+    
+    % Initialize Jacobian matrix
+    J = zeros(n, n);
+    
+    % Compute function value at x
+    F_x = F(x);
+    
+    % Compute each column of the Jacobian
+    for j = 1:n
+        % Create perturbation vector
+        e = zeros(n, 1);
+        e(j) = h;
+        
+        % Compute perturbed function value
+        F_x_plus_h = F(x + e);
+        
+        % Compute jth column of Jacobian using forward difference
+        J(:, j) = (F_x_plus_h - F_x) / h;
+    end
+end</code></pre>
+                </div>
+                
+                <p>This function computes the Jacobian matrix numerically using the forward difference approximation. For each column of the Jacobian, it perturbs the corresponding variable and computes the resulting change in the function values.</p>
+                
+                <p>We can then use this numerical Jacobian in the Newton-Raphson method for systems:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [x, iterations, convergence] = newton_raphson_system_numerical(F, x0, tol, max_iter, h)
+    % NEWTON_RAPHSON_SYSTEM_NUMERICAL Solve system using Newton-Raphson with numerical Jacobian
+    
+    % Set default values for optional parameters
+    if nargin < 3
+        tol = 1e-6;
+    end
+    
+    if nargin < 4
+        max_iter = 100;
+    end
+    
+    if nargin < 5
+        h = 1e-6;  % Step size for numerical differentiation
+    end
+    
+    % Initialize variables
+    x = x0(:);  % Ensure column vector
+    n = length(x);
+    convergence = cell(max_iter + 1, 1);
+    convergence{1} = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value
+        F_val = F(x);
+        
+        % Compute Jacobian numerically
+        J_val = numerical_jacobian(F, x, h);
+        
+        % Check if Jacobian is singular
+        if rcond(J_val) < eps
+            warning('Jacobian is nearly singular. Method may not converge.');
+            % Could use regularization or other techniques here
+        end
+        
+        % Solve linear system J(x) * dx = -F(x)
+        dx = J_val \ (-F_val);
+        
+        % Compute next approximation
+        x_next = x + dx;
+        
+        % Store current approximation
+        convergence{i + 1} = x_next;
+        
+        % Check for convergence
+        if norm(dx) < tol
+            x = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation allows us to solve systems of nonlinear equations without explicitly providing the Jacobian matrix.</p>
+                
+                <h4>Using MATLAB's Built-in Functions</h4>
+                <p>MATLAB provides built-in functions for solving nonlinear equations and systems:</p>
+                <ul>
+                    <li><code>fzero</code> - For finding a root of a scalar function</li>
+                    <li><code>fsolve</code> - For solving systems of nonlinear equations</li>
+                </ul>
+                
+                <p>These functions use sophisticated algorithms that combine Newton-Raphson with other methods to improve robustness. Here's how to use them:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Using fzero for scalar equations
+f = @(x) x^2 - 4;  % Find x such that x^2 - 4 = 0
+x0 = 1;  % Initial guess
+x = fzero(f, x0);
+fprintf('Root found by fzero: %.10f\n', x);
+
+% Using fsolve for systems of equations
+F = @(x) [x(1)^2 + x(2)^2 - 4; x(1) - x(2)];  % System of two equations
+x0 = [1; 1];  % Initial guess
+options = optimoptions('fsolve', 'Display', 'iter');  % Show iterations
+x = fsolve(F, x0, options);
+fprintf('Solution found by fsolve: [%.10f, %.10f]\n', x(1), x(2));</code></pre>
+                </div>
+                
+                <p>While these built-in functions are convenient and robust, implementing the Newton-Raphson method ourselves provides better understanding of the algorithm and allows for customization.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Practical Applications</h3>
+                
+                <h4>Example 1: Finding Square Roots</h4>
+                <p>Let's use the Newton-Raphson method to compute the square root of a number \(a\). We want to find \(x\) such that \(x^2 = a\), or equivalently, \(f(x) = x^2 - a = 0\).</p>
+                
+                <p>The derivative is \(f'(x) = 2x\).</p>
+                
+                <div class="code-example">
+                    <pre><code>% Find square root of a number using Newton-Raphson
+a = 2;  % Find square root of 2
+
+% Define function and its derivative
+f = @(x) x^2 - a;
+df = @(x) 2*x;
+
+% Initial guess
+x0 = 1;
+
+% Apply Newton-Raphson method
+[root, iterations, convergence] = newton_raphson(f, df, x0, 1e-10, 100);
+
+% Display results
+fprintf('Square root of %g found by Newton-Raphson: %.10f\n', a, root);
+fprintf('Actual square root: %.10f\n', sqrt(a));
+fprintf('Error: %.2e\n', abs(root - sqrt(a)));
+fprintf('Number of iterations: %d\n', iterations);
+
+% Plot convergence
+figure;
+semilogy(0:iterations, abs(convergence - sqrt(a)), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Newton-Raphson Method for Square Root');
+grid on;
+
+% Display iteration values
+fprintf('\nIteration\tApproximation\t\tError\n');
+fprintf('-------------------------------------------------\n');
+for i = 1:iterations+1
+    fprintf('%d\t\t%.10f\t\t%.2e\n', i-1, convergence(i), abs(convergence(i) - sqrt(a)));
+end</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Define a function and its derivative for finding the square root</li>
+                    <li>Apply the Newton-Raphson method to find the root</li>
+                    <li>Analyze the convergence behavior</li>
+                    <li>Visualize the error at each iteration</li>
+                </ol>
+                
+                <p>The results show that the Newton-Raphson method converges quadratically to the square root, with each iteration approximately doubling the number of correct digits.</p>
+                
+                <h4>Example 2: Finding Intersection Points</h4>
+                <p>Let's find the intersection points of two curves: \(y = \sin(x)\) and \(y = x^2 - 2\).</p>
+                
+                <p>We need to solve \(f(x) = \sin(x) - (x^2 - 2) = 0\).</p>
+                
+                <p>The derivative is \(f'(x) = \cos(x) - 2x\).</p>
+                
+                <div class="code-example">
+                    <pre><code>% Find intersection points of two curves
+% y = sin(x) and y = x^2 - 2
+
+% Define function and its derivative
+f = @(x) sin(x) - (x^2 - 2);
+df = @(x) cos(x) - 2*x;
+
+% Plot the curves to visualize intersection points
+x_plot = linspace(-2, 2, 1000);
+y1 = sin(x_plot);
+y2 = x_plot.^2 - 2;
+
+figure;
+plot(x_plot, y1, 'b-', 'LineWidth', 2, 'DisplayName', 'y = sin(x)');
+hold on;
+plot(x_plot, y2, 'r-', 'LineWidth', 2, 'DisplayName', 'y = x^2 - 2');
+plot(x_plot, zeros(size(x_plot)), 'k--', 'DisplayName', 'y = 0');
+xlabel('x');
+ylabel('y');
+title('Intersection of y = sin(x) and y = x^2 - 2');
+legend('show');
+grid on;
+
+% From the plot, we can see there are two intersection points
+% Let's find them using Newton-Raphson with different initial guesses
+
+% First intersection point (near x = -1.4)
+x0_1 = -1.5;
+[root1, iter1, conv1] = newton_raphson(f, df, x0_1, 1e-10, 100);
+
+% Second intersection point (near x = 1.4)
+x0_2 = 1.5;
+[root2, iter2, conv2] = newton_raphson(f, df, x0_2, 1e-10, 100);
+
+% Mark intersection points on the plot
+plot(root1, sin(root1), 'go', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Intersection 1');
+plot(root2, sin(root2), 'mo', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Intersection 2');
+legend('show');
+
+% Display results
+fprintf('Intersection points:\n');
+fprintf('1. x = %.10f, y = %.10f\n', root1, sin(root1));
+fprintf('2. x = %.10f, y = %.10f\n', root2, sin(root2));
+
+% Verify the results
+fprintf('\nVerification:\n');
+fprintf('1. sin(%.10f) = %.10f, %.10f^2 - 2 = %.10f\n', ...
+        root1, sin(root1), root1, root1^2 - 2);
+fprintf('2. sin(%.10f) = %.10f, %.10f^2 - 2 = %.10f\n', ...
+        root2, sin(root2), root2, root2^2 - 2);
+
+% Plot convergence
+figure;
+subplot(1, 2, 1);
+semilogy(0:iter1, abs(diff([conv1; root1])), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('|x_{n+1} - x_n|');
+title('Convergence for First Root');
+grid on;
+
+subplot(1, 2, 2);
+semilogy(0:iter2, abs(diff([conv2; root2])), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('|x_{n+1} - x_n|');
+title('Convergence for Second Root');
+grid on;</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Visualize the problem to identify potential roots</li>
+                    <li>Use different initial guesses to find multiple roots</li>
+                    <li>Verify the results by substituting back into the original equations</li>
+                    <li>Analyze the convergence behavior for each root</li>
+                </ol>
+                
+                <p>The results show that the Newton-Raphson method can find multiple roots of an equation when provided with appropriate initial guesses.</p>
+                
+                <h4>Example 3: Solving a Nonlinear System</h4>
+                <p>Let's solve a system of nonlinear equations:</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    x^2 + y^2 &= 4 \\
+                    e^x - y &= 1
+                    \end{align} \]
+                </div>
+                
+                <p>We define the vector-valued function \(\mathbf{F}(\mathbf{x})\) and its Jacobian matrix \(\mathbf{J}(\mathbf{x})\):</p>
+                
+                <div class="code-example">
+                    <pre><code>% Solve a system of nonlinear equations
+% x^2 + y^2 = 4
+% e^x - y = 1
+
+% Define the system of equations
+F = @(x) [x(1)^2 + x(2)^2 - 4; exp(x(1)) - x(2) - 1];
+
+% Define the Jacobian matrix
+J = @(x) [2*x(1), 2*x(2); exp(x(1)), -1];
+
+% Initial guess
+x0 = [1; 1];
+
+% Apply Newton-Raphson method
+[x, iterations, convergence] = newton_raphson_system(F, J, x0, 1e-10, 100);
+
+% Display results
+fprintf('Solution found by Newton-Raphson:\n');
+fprintf('x = %.10f, y = %.10f\n', x(1), x(2));
+
+% Verify the solution
+F_val = F(x);
+fprintf('\nVerification (should be close to zero):\n');
+fprintf('Equation 1: %.2e\n', F_val(1));
+fprintf('Equation 2: %.2e\n', F_val(2));
+
+% Plot the system and solution
+figure;
+% Create a grid of points
+[X, Y] = meshgrid(linspace(-3, 3, 100), linspace(-3, 3, 100));
+Z1 = X.^2 + Y.^2 - 4;
+Z2 = exp(X) - Y - 1;
+
+% Plot the contours
+contour(X, Y, Z1, [0, 0], 'b-', 'LineWidth', 2, 'DisplayName', 'x^2 + y^2 = 4');
+hold on;
+contour(X, Y, Z2, [0, 0], 'r-', 'LineWidth', 2, 'DisplayName', 'e^x - y = 1');
+
+% Mark the solution
+plot(x(1), x(2), 'go', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Solution');
+
+% Mark the initial guess
+plot(x0(1), x0(2), 'mo', 'MarkerSize', 8, 'LineWidth', 2, 'DisplayName', 'Initial Guess');
+
+% Plot the convergence path
+for i = 1:length(convergence)-1
+    x_i = convergence{i};
+    x_i_plus_1 = convergence{i+1};
+    plot([x_i(1), x_i_plus_1(1)], [x_i(2), x_i_plus_1(2)], 'k-o', 'LineWidth', 1);
+end
+
+xlabel('x');
+ylabel('y');
+title('Solution of Nonlinear System');
+legend('show');
+grid on;
+axis equal;
+
+% Plot convergence
+figure;
+errors = zeros(iterations, 1);
+for i = 1:iterations
+    errors(i) = norm([convergence{i+1}(1) - x(1); convergence{i+1}(2) - x(2)]);
+end
+
+semilogy(1:iterations, errors, 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error (norm)');
+title('Convergence of Newton-Raphson Method for Nonlinear System');
+grid on;</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Define a system of nonlinear equations and its Jacobian matrix</li>
+                    <li>Apply the Newton-Raphson method to find the solution</li>
+                    <li>Visualize the system and the convergence path</li>
+                    <li>Analyze the convergence behavior</li>
+                </ol>
+                
+                <p>The results show that the Newton-Raphson method can efficiently solve systems of nonlinear equations, with quadratic convergence when the initial guess is sufficiently close to the solution.</p>
+                
+                <h4>Example 4: Finding Critical Points</h4>
+                <p>Let's find the critical points of a function \(g(x) = x^3 - 6x^2 + 9x + 1\) by finding the roots of its derivative \(g'(x) = 3x^2 - 12x + 9\).</p>
+                
+                <div class="code-example">
+                    <pre><code>% Find critical points of a function
+% g(x) = x^3 - 6x^2 + 9x + 1
+
+% Define the original function
+g = @(x) x.^3 - 6*x.^2 + 9*x + 1;
+
+% Define the derivative and its derivative
+f = @(x) 3*x.^2 - 12*x + 9;  % g'(x)
+df = @(x) 6*x - 12;          % g''(x)
+
+% Plot the function to visualize critical points
+x_plot = linspace(0, 4, 1000);
+y_plot = g(x_plot);
+
+figure;
+plot(x_plot, y_plot, 'b-', 'LineWidth', 2);
+xlabel('x');
+ylabel('g(x)');
+title('g(x) = x^3 - 6x^2 + 9x + 1');
+grid on;
+
+% Find critical points using Newton-Raphson
+% From the derivative, we expect two critical points
+% Let's use different initial guesses
+
+% First critical point (near x = 1)
+x0_1 = 0.5;
+[cp1, iter1, conv1] = newton_raphson(f, df, x0_1, 1e-10, 100);
+
+% Second critical point (near x = 3)
+x0_2 = 3.5;
+[cp2, iter2, conv2] = newton_raphson(f, df, x0_2, 1e-10, 100);
+
+% Mark critical points on the plot
+hold on;
+plot(cp1, g(cp1), 'ro', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Critical Point 1');
+plot(cp2, g(cp2), 'go', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Critical Point 2');
+legend('show');
+
+% Display results
+fprintf('Critical points:\n');
+fprintf('1. x = %.10f, g(x) = %.10f, g''(x) = %.2e\n', cp1, g(cp1), f(cp1));
+fprintf('2. x = %.10f, g(x) = %.10f, g''(x) = %.2e\n', cp2, g(cp2), f(cp2));
+
+% Determine the nature of critical points
+fprintf('\nNature of critical points:\n');
+if df(cp1) < 0
+    fprintf('1. x = %.10f is a local maximum\n', cp1);
+else
+    fprintf('1. x = %.10f is a local minimum\n', cp1);
+end
+
+if df(cp2) < 0
+    fprintf('2. x = %.10f is a local maximum\n', cp2);
+else
+    fprintf('2. x = %.10f is a local minimum\n', cp2);
+end
+
+% Plot convergence
+figure;
+subplot(1, 2, 1);
+semilogy(0:iter1, abs(diff([conv1; cp1])), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('|x_{n+1} - x_n|');
+title('Convergence for First Critical Point');
+grid on;
+
+subplot(1, 2, 2);
+semilogy(0:iter2, abs(diff([conv2; cp2])), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('|x_{n+1} - x_n|');
+title('Convergence for Second Critical Point');
+grid on;</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Find critical points of a function by solving for the roots of its derivative</li>
+                    <li>Determine the nature of critical points (local minima or maxima) using the second derivative</li>
+                    <li>Visualize the function and its critical points</li>
+                    <li>Analyze the convergence behavior for each critical point</li>
+                </ol>
+                
+                <p>The results show that the Newton-Raphson method can efficiently find critical points of a function, which is useful in optimization problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Advanced Topics</h3>
+                
+                <h4>Convergence Acceleration</h4>
+                <p>The standard Newton-Raphson method can be slow to converge for certain types of functions. Several modifications can accelerate convergence:</p>
+                
+                <h5>Damped Newton Method</h5>
+                <p>The damped Newton method introduces a step size parameter \(\alpha\) to control the update:</p>
+                
+                <div class="equation">
+                    \[ x_{n+1} = x_n - \alpha \frac{f(x_n)}{f'(x_n)} \]
+                </div>
+                
+                <p>The step size \(\alpha\) can be chosen adaptively to ensure that each iteration reduces the function value:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = damped_newton_raphson(f, df, x0, tol, max_iter)
+    % DAMPED_NEWTON_RAPHSON Find root using damped Newton-Raphson method
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    % Initialize variables
+    x = x0;
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check if derivative is close to zero
+        if abs(df_val) < eps
+            warning('Derivative close to zero. Method may not converge.');
+            df_val = sign(df_val) * eps;  % Avoid division by zero
+        end
+        
+        % Compute Newton direction
+        dx = f_val / df_val;
+        
+        % Initialize step size
+        alpha = 1.0;
+        
+        % Line search to find appropriate step size
+        x_new = x - alpha * dx;
+        f_new = f(x_new);
+        
+        % Backtracking line search
+        while abs(f_new) > abs(f_val) && alpha > 1e-4
+            alpha = alpha / 2;
+            x_new = x - alpha * dx;
+            f_new = f(x_new);
+        end
+        
+        % Store current approximation
+        convergence(i + 1) = x_new;
+        
+        % Check for convergence
+        if abs(x_new - x) < tol
+            root = x_new;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_new;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses a backtracking line search to find an appropriate step size that reduces the function value. This can improve convergence for functions with steep gradients or multiple roots.</p>
+                
+                <h5>Secant Method</h5>
+                <p>The secant method approximates the derivative using the secant line through two consecutive points, eliminating the need for an explicit derivative:</p>
+                
+                <div class="equation">
+                    \[ x_{n+1} = x_n - f(x_n) \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \]
+                </div>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = secant_method(f, x0, x1, tol, max_iter)
+    % SECANT_METHOD Find root of equation f(x) = 0 using secant method
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    % Initialize variables
+    x_prev = x0;
+    x = x1;
+    convergence = zeros(max_iter + 2, 1);
+    convergence(1) = x_prev;
+    convergence(2) = x;
+    
+    % Compute initial function values
+    f_prev = f(x_prev);
+    f_val = f(x);
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Check if difference is close to zero
+        if abs(f_val - f_prev) < eps
+            warning('Division by near-zero value. Method may not converge.');
+            break;
+        end
+        
+        % Compute next approximation
+        x_next = x - f_val * (x - x_prev) / (f_val - f_prev);
+        
+        % Store current approximation
+        convergence(i + 2) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i + 1;  % Include initial points
+            convergence = convergence(1:i + 2);
+            return;
+        end
+        
+        % Update variables for next iteration
+        x_prev = x;
+        f_prev = f_val;
+        x = x_next;
+        f_val = f(x);
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter + 1;  % Include initial points
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>The secant method has a convergence rate of approximately 1.618 (the golden ratio), which is between the linear convergence of the bisection method and the quadratic convergence of Newton's method. However, it requires only one function evaluation per iteration (after the initial two), compared to two for Newton's method (function and derivative).</p>
+                
+                <h5>Broyden's Method for Systems</h5>
+                <p>Broyden's method is a quasi-Newton method for solving systems of nonlinear equations. It approximates the Jacobian matrix and updates it at each iteration without computing it explicitly:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [x, iterations, convergence] = broyden_method(F, J0, x0, tol, max_iter)
+    % BROYDEN_METHOD Solve system of nonlinear equations using Broyden's method
+    %   Broyden's method is a quasi-Newton method that approximates the Jacobian
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    % Initialize variables
+    x = x0(:);  % Ensure column vector
+    n = length(x);
+    convergence = cell(max_iter + 1, 1);
+    convergence{1} = x;
+    
+    % Compute initial function value
+    F_val = F(x);
+    
+    % Initialize Jacobian approximation
+    if isa(J0, 'function_handle')
+        % If J0 is a function handle, evaluate it at x0
+        J = J0(x);
+    else
+        % If J0 is a matrix, use it directly
+        J = J0;
+    end
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Solve linear system J * dx = -F_val
+        dx = J \ (-F_val);
+        
+        % Compute next approximation
+        x_next = x + dx;
+        
+        % Store current approximation
+        convergence{i + 1} = x_next;
+        
+        % Check for convergence
+        if norm(dx) < tol
+            x = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Compute new function value
+        F_next = F(x_next);
+        
+        % Compute difference vectors
+        dF = F_next - F_val;
+        
+        % Update Jacobian approximation using Broyden's formula
+        % J_{k+1} = J_k + (dF - J_k * dx) * dx' / (dx' * dx)
+        J = J + (dF - J * dx) * dx' / (dx' * dx);
+        
+        % Update variables for next iteration
+        x = x_next;
+        F_val = F_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>Broyden's method reduces the computational cost by avoiding the explicit computation of the Jacobian matrix at each iteration. It is particularly useful for large systems where computing the Jacobian is expensive.</p>
+                
+                <h4>Handling Multiple Roots</h4>
+                <p>When a function has multiple roots, the Newton-Raphson method may converge to different roots depending on the initial guess. We can use a technique called deflation to find multiple roots:</p>
+                
+                <div class="code-example">
+                    <pre><code>function roots = find_multiple_roots(f, df, a, b, n_roots, tol, max_iter)
+    % FIND_MULTIPLE_ROOTS Find multiple roots of a function using deflation
+    %   ROOTS = FIND_MULTIPLE_ROOTS(F, DF, A, B, N_ROOTS, TOL, MAX_ITER)
+    %   finds multiple roots of the equation F(x) = 0 in the interval [A, B]
+    %   using the Newton-Raphson method with deflation.
+    
+    % Set default values for optional parameters
+    if nargin < 6
+        tol = 1e-6;
+    end
+    
+    if nargin < 7
+        max_iter = 100;
+    end
+    
+    % Initialize array to store roots
+    roots = zeros(n_roots, 1);
+    
+    % Current function and its derivative
+    f_current = f;
+    df_current = df;
+    
+    % Find roots one by one
+    for i = 1:n_roots
+        % Generate random initial guess in [a, b]
+        x0 = a + (b - a) * rand();
+        
+        % Find root using Newton-Raphson
+        [root, ~, ~] = newton_raphson(f_current, df_current, x0, tol, max_iter);
+        
+        % Store the root
+        roots(i) = root;
+        
+        % Deflate the function to remove this root
+        % f_new(x) = f_current(x) / (x - root)
+        % This requires computing f_current and df_current for the next iteration
+        
+        % Create deflated function and its derivative
+        f_current_old = f_current;  % Save current function for derivative calculation
+        
+        % Deflated function
+        f_current = @(x) deflated_function(f_current_old, root, x);
+        
+        % Derivative of deflated function
+        df_current = @(x) deflated_derivative(f_current_old, df_current, root, x);
+    end
+end
+
+function y = deflated_function(f, root, x)
+    % DEFLATED_FUNCTION Compute value of deflated function
+    %   f_new(x) = f(x) / (x - root)
+    
+    if abs(x - root) < eps
+        % If x is very close to root, use limit value
+        % f_new(root) = f'(root)
+        y = limit_quotient(f, root);
+    else
+        y = f(x) / (x - root);
+    end
+end
+
+function y = deflated_derivative(f, df, root, x)
+    % DEFLATED_DERIVATIVE Compute derivative of deflated function
+    %   f_new'(x) = [f'(x) * (x - root) - f(x)] / (x - root)^2
+    
+    if abs(x - root) < eps
+        % If x is very close to root, use limit value
+        % f_new'(root) = f''(root) / 2
+        y = limit_derivative_quotient(f, df, root);
+    else
+        y = (df(x) * (x - root) - f(x)) / (x - root)^2;
+    end
+end
+
+function y = limit_quotient(f, x)
+    % LIMIT_QUOTIENT Compute limit of f(x) / (x - x0) as x approaches x0
+    %   This is equivalent to f'(x0) by L'Hôpital's rule
+    
+    % Use numerical differentiation to approximate f'(x0)
+    h = 1e-6;
+    y = (f(x + h) - f(x - h)) / (2 * h);
+end
+
+function y = limit_derivative_quotient(f, df, x)
+    % LIMIT_DERIVATIVE_QUOTIENT Compute limit of derivative of f(x) / (x - x0)
+    %   This is equivalent to f''(x0) / 2 by L'Hôpital's rule
+    
+    % Use numerical differentiation to approximate f''(x0)
+    h = 1e-6;
+    y = (df(x + h) - df(x - h)) / (2 * h) / 2;
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses deflation to find multiple roots of a function. After finding a root, it divides the function by \((x - root)\) to remove that root and continues searching for additional roots.</p>
+                
+                <h4>Global Convergence Strategies</h4>
+                <p>The Newton-Raphson method may not converge if the initial guess is far from the root. Several strategies can improve global convergence:</p>
+                
+                <h5>Combining with Bisection Method</h5>
+                <p>We can combine the Newton-Raphson method with the bisection method to ensure convergence:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = newton_bisection(f, df, a, b, tol, max_iter)
+    % NEWTON_BISECTION Find root using combined Newton-Raphson and bisection
+    %   Ensures global convergence by falling back to bisection when needed
+    
+    % Set default values for optional parameters
+    if nargin < 5
+        tol = 1e-6;
+    end
+    
+    if nargin < 6
+        max_iter = 100;
+    end
+    
+    % Check if interval [a, b] contains a root
+    f_a = f(a);
+    f_b = f(b);
+    
+    if f_a * f_b > 0
+        error('Function must have opposite signs at interval endpoints');
+    end
+    
+    % Initialize variables
+    x = (a + b) / 2;  % Start with midpoint
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check if function value is close to zero
+        if abs(f_val) < tol
+            root = x;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Compute Newton step
+        if abs(df_val) > eps
+            dx = f_val / df_val;
+            x_newton = x - dx;
+        else
+            % If derivative is close to zero, use bisection
+            x_newton = x;
+        end
+        
+        % Check if Newton step is within the interval and decreases |f|
+        if x_newton >= a && x_newton <= b && abs(f(x_newton)) < abs(f_val)
+            % Accept Newton step
+            x_next = x_newton;
+        else
+            % Fall back to bisection
+            if f_val * f_a < 0
+                b = x;
+                f_b = f_val;
+            else
+                a = x;
+                f_a = f_val;
+            end
+            x_next = (a + b) / 2;
+        end
+        
+        % Store current approximation
+        convergence(i + 1) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation combines the fast convergence of the Newton-Raphson method with the guaranteed convergence of the bisection method. It attempts to use the Newton step if it's within the current bracket and reduces the function value; otherwise, it falls back to a bisection step.</p>
+                
+                <h5>Trust Region Methods</h5>
+                <p>Trust region methods constrain the step size based on a region where the linear approximation is trusted:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [root, iterations, convergence] = newton_trust_region(f, df, x0, tol, max_iter, delta_max)
+    % NEWTON_TRUST_REGION Find root using Newton method with trust region
+    
+    % Set default values for optional parameters
+    if nargin < 4
+        tol = 1e-6;
+    end
+    
+    if nargin < 5
+        max_iter = 100;
+    end
+    
+    if nargin < 6
+        delta_max = 1.0;  % Maximum trust region radius
+    end
+    
+    % Initialize variables
+    x = x0;
+    delta = delta_max / 2;  % Initial trust region radius
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute function value and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check if function value is close to zero
+        if abs(f_val) < tol
+            root = x;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Compute Newton step
+        if abs(df_val) > eps
+            dx_newton = f_val / df_val;
+        else
+            % If derivative is close to zero, use a small step
+            dx_newton = sign(f_val) * tol;
+        end
+        
+        % Apply trust region constraint
+        if abs(dx_newton) > delta
+            dx = sign(dx_newton) * delta;
+        else
+            dx = dx_newton;
+        end
+        
+        % Compute next approximation
+        x_next = x - dx;
+        
+        % Evaluate function at new point
+        f_next = f(x_next);
+        
+        % Compute actual reduction and predicted reduction
+        actual_reduction = abs(f_val) - abs(f_next);
+        predicted_reduction = abs(f_val) - abs(f_val - df_val * dx);
+        
+        % Update trust region radius based on performance
+        if predicted_reduction > 0
+            rho = actual_reduction / predicted_reduction;
+            
+            if rho < 0.25
+                delta = delta / 2;
+            elseif rho > 0.75 && abs(dx) == delta
+                delta = min(2 * delta, delta_max);
+            end
+        else
+            delta = delta / 2;
+        end
+        
+        % Store current approximation
+        convergence(i + 1) = x_next;
+        
+        % Check for convergence
+        if abs(x_next - x) < tol
+            root = x_next;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update current approximation
+        x = x_next;
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = x;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses a trust region approach to constrain the step size based on how well the linear approximation predicts the actual function behavior. It adjusts the trust region radius based on the ratio of actual reduction to predicted reduction in the function value.</p>
+                
+                <h4>Comparison with Other Root-Finding Methods</h4>
+                <p>Let's compare the Newton-Raphson method with other root-finding methods:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Compare different root-finding methods
+% Find root of f(x) = x^3 - 2*x - 5
+
+% Define function and its derivative
+f = @(x) x^3 - 2*x - 5;
+df = @(x) 3*x^2 - 2;
+
+% Initial values
+a = 2;  % Lower bound
+b = 3;  % Upper bound
+x0 = 2.5;  % Initial guess for methods that need one
+x1 = 2.6;  % Second initial guess for secant method
+
+% Tolerance and maximum iterations
+tol = 1e-10;
+max_iter = 100;
+
+% Apply different methods
+[root_bisection, iter_bisection, conv_bisection] = bisection_method(f, a, b, tol, max_iter);
+[root_newton, iter_newton, conv_newton] = newton_raphson(f, df, x0, tol, max_iter);
+[root_secant, iter_secant, conv_secant] = secant_method(f, x0, x1, tol, max_iter);
+[root_newton_bisection, iter_newton_bisection, conv_newton_bisection] = newton_bisection(f, df, a, b, tol, max_iter);
+
+% Display results
+fprintf('Comparison of root-finding methods for f(x) = x^3 - 2*x - 5:\n');
+fprintf('Method\t\t\tRoot\t\t\tIterations\tFunction Value\n');
+fprintf('------------------------------------------------------------------\n');
+fprintf('Bisection\t\t%.10f\t%d\t\t%.2e\n', root_bisection, iter_bisection, f(root_bisection));
+fprintf('Newton-Raphson\t\t%.10f\t%d\t\t%.2e\n', root_newton, iter_newton, f(root_newton));
+fprintf('Secant\t\t\t%.10f\t%d\t\t%.2e\n', root_secant, iter_secant, f(root_secant));
+fprintf('Newton-Bisection\t%.10f\t%d\t\t%.2e\n', root_newton_bisection, iter_newton_bisection, f(root_newton_bisection));
+
+% Plot convergence
+figure;
+semilogy(0:iter_bisection, abs(conv_bisection - root_bisection), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Bisection');
+hold on;
+semilogy(0:iter_newton, abs(conv_newton - root_newton), 's-', 'LineWidth', 1.5, 'DisplayName', 'Newton-Raphson');
+semilogy(0:iter_secant, abs(conv_secant - root_secant), 'd-', 'LineWidth', 1.5, 'DisplayName', 'Secant');
+semilogy(0:iter_newton_bisection, abs(conv_newton_bisection - root_newton_bisection), '^-', 'LineWidth', 1.5, 'DisplayName', 'Newton-Bisection');
+
+xlabel('Iteration');
+ylabel('Error (log scale)');
+title('Convergence Comparison of Root-Finding Methods');
+legend('show');
+grid on;
+
+% Bisection method implementation
+function [root, iterations, convergence] = bisection_method(f, a, b, tol, max_iter)
+    % Check if interval [a, b] contains a root
+    f_a = f(a);
+    f_b = f(b);
+    
+    if f_a * f_b > 0
+        error('Function must have opposite signs at interval endpoints');
+    end
+    
+    % Initialize variables
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = (a + b) / 2;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute midpoint
+        c = (a + b) / 2;
+        f_c = f(c);
+        
+        % Check if midpoint is a root
+        if abs(f_c) < tol
+            root = c;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Update interval
+        if f_c * f_a < 0
+            b = c;
+            f_b = f_c;
+        else
+            a = c;
+            f_a = f_c;
+        end
+        
+        % Store current approximation
+        convergence(i + 1) = (a + b) / 2;
+        
+        % Check for convergence
+        if (b - a) < tol
+            root = (a + b) / 2;
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    root = (a + b) / 2;
+    iterations = max_iter;
+    convergence = convergence;
+end</code></pre>
+                </div>
+                
+                <p>This comparison shows that:</p>
+                <ol>
+                    <li>The bisection method is reliable but converges slowly (linear convergence)</li>
+                    <li>The Newton-Raphson method converges rapidly (quadratic convergence) when the initial guess is good</li>
+                    <li>The secant method has superlinear convergence (order 1.618) and doesn't require the derivative</li>
+                    <li>The combined Newton-bisection method offers a good balance of speed and reliability</li>
+                </ol>
+                
+                <p>The choice of method depends on the specific problem, the availability of derivatives, and the requirements for reliability versus speed.</p>
+            </section>
+            
+            <section class="practice-problems">
+                <h3>Practice Problems</h3>
+                
+                <div class="problem-card">
+                    <h4>Problem 1: Finding Roots of Polynomials</h4>
+                    <p>Consider the polynomial \(p(x) = x^4 - 7x^3 + 3x^2 + 43x - 60\).</p>
+                    <ol>
+                        <li>Use the Newton-Raphson method to find all real roots of this polynomial</li>
+                        <li>Verify your results by evaluating the polynomial at each root</li>
+                        <li>Compare the performance of the Newton-Raphson method with MATLAB's built-in <code>roots</code> function</li>
+                        <li>Investigate the convergence behavior for each root</li>
+                    </ol>
+                    
+                    <button id="newton-problem1-btn" class="btn">Show Solution</button>
+                    
+                    <div id="newton-problem1-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Finding Roots of Polynomials
+% Polynomial: p(x) = x^4 - 7x^3 + 3x^2 + 43x - 60
+
+% Define the polynomial and its derivative
+p = [1, -7, 3, 43, -60];  % Coefficients in descending order
+dp = polyder(p);  % Derivative coefficients
+
+% Function handles for polynomial and its derivative
+f = @(x) polyval(p, x);
+df = @(x) polyval(dp, x);
+
+% Plot the polynomial to visualize roots
+x_plot = linspace(-5, 10, 1000);
+y_plot = polyval(p, x_plot);
+
+figure;
+plot(x_plot, y_plot, 'b-', 'LineWidth', 2);
+hold on;
+plot(x_plot, zeros(size(x_plot)), 'k--');
+xlabel('x');
+ylabel('p(x)');
+title('Polynomial: p(x) = x^4 - 7x^3 + 3x^2 + 43x - 60');
+grid on;
+
+% From the plot, we can see there are 4 real roots
+% Let's use different initial guesses to find them
+
+% Initial guesses based on visual inspection
+initial_guesses = [-3, 1, 3, 6];
+roots_newton = zeros(length(initial_guesses), 1);
+iterations = zeros(length(initial_guesses), 1);
+convergence = cell(length(initial_guesses), 1);
+
+% Find roots using Newton-Raphson
+for i = 1:length(initial_guesses)
+    [roots_newton(i), iterations(i), convergence{i}] = newton_raphson(f, df, initial_guesses(i), 1e-10, 100);
+end
+
+% Mark roots on the plot
+plot(roots_newton, zeros(size(roots_newton)), 'ro', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Roots (Newton)');
+
+% Find roots using MATLAB's roots function
+roots_matlab = roots(p);
+roots_matlab_real = roots_matlab(abs(imag(roots_matlab)) < 1e-10);
+roots_matlab_real = sort(real(roots_matlab_real));
+
+% Mark MATLAB roots on the plot
+plot(roots_matlab_real, zeros(size(roots_matlab_real)), 'gx', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Roots (MATLAB)');
+legend('show');
+
+% Display results
+fprintf('Roots found by Newton-Raphson method:\n');
+for i = 1:length(roots_newton)
+    fprintf('Root %d: %.10f (iterations: %d, p(root) = %.2e)\n', ...
+            i, roots_newton(i), iterations(i), f(roots_newton(i)));
+end
+
+fprintf('\nRoots found by MATLAB''s roots function:\n');
+for i = 1:length(roots_matlab_real)
+    fprintf('Root %d: %.10f (p(root) = %.2e)\n', ...
+            i, roots_matlab_real(i), f(roots_matlab_real(i)));
+end
+
+% Plot convergence for each root
+figure;
+for i = 1:length(initial_guesses)
+    subplot(2, 2, i);
+    semilogy(0:iterations(i), abs(convergence{i} - roots_newton(i)), 'o-', 'LineWidth', 1.5);
+    xlabel('Iteration');
+    ylabel('Error');
+    title(sprintf('Convergence for Root %.2f', roots_newton(i)));
+    grid on;
+end
+
+% Analyze convergence rate
+figure;
+for i = 1:length(initial_guesses)
+    % Compute errors
+    errors = abs(convergence{i} - roots_newton(i));
+    
+    % Skip the last error (which is zero)
+    errors = errors(1:end-1);
+    
+    % Need at least 3 iterations to analyze convergence rate
+    if length(errors) >= 3
+        subplot(2, 2, i);
+        
+        % Plot log(e_{n+1}) vs log(e_n)
+        loglog(errors(1:end-1), errors(2:end), 'o-', 'LineWidth', 1.5);
+        
+        % Add reference lines for linear and quadratic convergence
+        hold on;
+        e_range = logspace(log10(min(errors)), log10(max(errors)), 100);
+        loglog(e_range, e_range, 'k--', 'DisplayName', 'Linear');
+        loglog(e_range, e_range.^2, 'r--', 'DisplayName', 'Quadratic');
+        
+        xlabel('log(e_n)');
+        ylabel('log(e_{n+1})');
+        title(sprintf('Convergence Rate for Root %.2f', roots_newton(i)));
+        legend('show');
+        grid on;
+        
+        % Fit a line to estimate convergence rate
+        valid_idx = isfinite(log(errors(1:end-1))) & isfinite(log(errors(2:end)));
+        if sum(valid_idx) >= 2
+            p = polyfit(log(errors(1:end-1)), log(errors(2:end)), 1);
+            fprintf('Estimated convergence rate for root %.2f: %.2f\n', roots_newton(i), p(1));
+        end
+    end
+end</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 2: Solving a Nonlinear System with Numerical Jacobian</h4>
+                    <p>Consider the system of nonlinear equations:</p>
+                    <div class="equation">
+                        \[ \begin{align}
+                        \sin(x) + y^2 + \ln(z) &= 7 \\
+                        3x + 2^y - z^3 &= 5 \\
+                        x + y + z &= 10
+                        \end{align} \]
+                    </div>
+                    <ol>
+                        <li>Implement the Newton-Raphson method with a numerical Jacobian to solve this system</li>
+                        <li>Use an initial guess of \([4, 2, 4]^T\)</li>
+                        <li>Verify your solution by substituting it back into the original equations</li>
+                        <li>Compare your results with MATLAB's <code>fsolve</code> function</li>
+                        <li>Analyze the convergence behavior of the method</li>
+                    </ol>
+                    
+                    <button id="newton-problem2-btn" class="btn">Show Solution</button>
+                    
+                    <div id="newton-problem2-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Solving a Nonlinear System with Numerical Jacobian
+% System:
+% sin(x) + y^2 + ln(z) = 7
+% 3x + 2^y - z^3 = 5
+% x + y + z = 10
+
+% Define the system of equations
+F = @(x) [
+    sin(x(1)) + x(2)^2 + log(x(3)) - 7;
+    3*x(1) + 2^x(2) - x(3)^3 - 5;
+    x(1) + x(2) + x(3) - 10
+];
+
+% Initial guess
+x0 = [4; 2; 4];
+
+% Apply Newton-Raphson method with numerical Jacobian
+[x_newton, iter_newton, conv_newton] = newton_raphson_system_numerical(F, x0, 1e-10, 100);
+
+% Display results
+fprintf('Solution found by Newton-Raphson with numerical Jacobian:\n');
+fprintf('x = %.10f, y = %.10f, z = %.10f\n', x_newton(1), x_newton(2), x_newton(3));
+
+% Verify the solution
+F_val = F(x_newton);
+fprintf('\nVerification (should be close to zero):\n');
+fprintf('Equation 1: %.2e\n', F_val(1));
+fprintf('Equation 2: %.2e\n', F_val(2));
+fprintf('Equation 3: %.2e\n', F_val(3));
+
+% Solve using MATLAB's fsolve
+options = optimoptions('fsolve', 'Display', 'iter', 'FunctionTolerance', 1e-10);
+[x_fsolve, fval, exitflag, output] = fsolve(F, x0, options);
+
+fprintf('\nSolution found by MATLAB''s fsolve:\n');
+fprintf('x = %.10f, y = %.10f, z = %.10f\n', x_fsolve(1), x_fsolve(2), x_fsolve(3));
+fprintf('Function values: [%.2e, %.2e, %.2e]\n', fval(1), fval(2), fval(3));
+fprintf('Number of iterations: %d\n', output.iterations);
+
+% Analyze convergence
+figure;
+errors = zeros(length(conv_newton)-1, 1);
+for i = 1:length(conv_newton)-1
+    errors(i) = norm(cell2mat(conv_newton(i)) - x_newton);
+end
+
+semilogy(1:length(errors), errors, 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error (norm)');
+title('Convergence of Newton-Raphson Method for Nonlinear System');
+grid on;
+
+% Analyze convergence rate
+if length(errors) >= 3
+    figure;
+    loglog(errors(1:end-1), errors(2:end), 'o-', 'LineWidth', 1.5);
+    
+    % Add reference lines for linear and quadratic convergence
+    hold on;
+    e_range = logspace(log10(min(errors)), log10(max(errors)), 100);
+    loglog(e_range, e_range, 'k--', 'DisplayName', 'Linear');
+    loglog(e_range, e_range.^2, 'r--', 'DisplayName', 'Quadratic');
+    
+    xlabel('log(e_n)');
+    ylabel('log(e_{n+1})');
+    title('Convergence Rate Analysis');
+    legend('show');
+    grid on;
+    
+    % Fit a line to estimate convergence rate
+    valid_idx = isfinite(log(errors(1:end-1))) & isfinite(log(errors(2:end)));
+    if sum(valid_idx) >= 2
+        p = polyfit(log(errors(1:end-1)), log(errors(2:end)), 1);
+        fprintf('\nEstimated convergence rate: %.2f\n', p(1));
+    end
+end</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 3: Optimization Using Newton's Method</h4>
+                    <p>Consider the function \(f(x) = e^x - 4x^2\).</p>
+                    <ol>
+                        <li>Use Newton's method to find the critical points of this function (where \(f'(x) = 0\))</li>
+                        <li>Determine which critical points are local maxima and which are local minima</li>
+                        <li>Implement a modified Newton's method for optimization that uses the second derivative to ensure convergence to a minimum</li>
+                        <li>Compare the performance of your method with MATLAB's <code>fminunc</code> function</li>
+                    </ol>
+                    
+                    <button id="newton-problem3-btn" class="btn">Show Solution</button>
+                    
+                    <div id="newton-problem3-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Optimization Using Newton's Method
+% Function: f(x) = e^x - 4x^2
+
+% Define the function and its derivatives
+f = @(x) exp(x) - 4*x.^2;
+df = @(x) exp(x) - 8*x;
+d2f = @(x) exp(x) - 8;
+
+% Plot the function to visualize critical points
+x_plot = linspace(-3, 3, 1000);
+y_plot = f(x_plot);
+
+figure;
+plot(x_plot, y_plot, 'b-', 'LineWidth', 2);
+xlabel('x');
+ylabel('f(x)');
+title('f(x) = e^x - 4x^2');
+grid on;
+
+% Find critical points using Newton's method
+% From the plot, we can see there are two critical points
+% Let's use different initial guesses
+
+% Initial guesses
+x0_1 = -1;  % For the first critical point
+x0_2 = 2;   % For the second critical point
+
+% Apply Newton's method to find critical points (where f'(x) = 0)
+[cp1, iter1, conv1] = newton_raphson(df, d2f, x0_1, 1e-10, 100);
+[cp2, iter2, conv2] = newton_raphson(df, d2f, x0_2, 1e-10, 100);
+
+% Mark critical points on the plot
+hold on;
+plot(cp1, f(cp1), 'ro', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Critical Point 1');
+plot(cp2, f(cp2), 'go', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Critical Point 2');
+legend('show');
+
+% Determine the nature of critical points
+fprintf('Critical points:\n');
+fprintf('1. x = %.10f, f(x) = %.10f, f''(x) = %.2e, f''''(x) = %.2e\n', ...
+        cp1, f(cp1), df(cp1), d2f(cp1));
+fprintf('2. x = %.10f, f(x) = %.10f, f''(x) = %.2e, f''''(x) = %.2e\n', ...
+        cp2, f(cp2), df(cp2), d2f(cp2));
+
+fprintf('\nNature of critical points:\n');
+if d2f(cp1) < 0
+    fprintf('1. x = %.10f is a local maximum\n', cp1);
+else
+    fprintf('1. x = %.10f is a local minimum\n', cp1);
+end
+
+if d2f(cp2) < 0
+    fprintf('2. x = %.10f is a local maximum\n', cp2);
+else
+    fprintf('2. x = %.10f is a local minimum\n', cp2);
+end
+
+% Implement modified Newton's method for optimization
+% This version ensures convergence to a minimum by using the absolute value of the second derivative
+function [x, iterations, convergence] = newton_optimization(df, d2f, x0, tol, max_iter)
+    % Initialize variables
+    x = x0;
+    convergence = zeros(max_iter + 1, 1);
+    convergence(1) = x;
+    
+    % Main iteration loop
+    for i = 1:max_iter
+        % Compute gradient and Hessian
+        grad = df(x);
+        hess = d2f(x);
+        
+        % Check if gradient is close to zero
+        if abs(grad) < tol
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+        
+        % Ensure Hessian is positive definite (for minimization)
+        if hess < 0
+            % If at a maximum, use steepest descent
+            dx = -sign(grad) * tol;
+        else
+            % Use Newton direction
+            dx = -grad / hess;
+        end
+        
+        % Update approximation
+        x = x + dx;
+        
+        % Store current approximation
+        convergence(i + 1) = x;
+        
+        % Check for convergence
+        if abs(dx) < tol
+            iterations = i;
+            convergence = convergence(1:i + 1);
+            return;
+        end
+    end
+    
+    % If reached maximum iterations without converging
+    warning('Maximum iterations reached. Method may not have converged.');
+    iterations = max_iter;
+    convergence = convergence;
+end
+
+% Apply modified Newton's method for optimization
+[min_x, min_iter, min_conv] = newton_optimization(df, d2f, 2, 1e-10, 100);
+
+fprintf('\nMinimum found by modified Newton''s method:\n');
+fprintf('x = %.10f, f(x) = %.10f, f''(x) = %.2e\n', min_x, f(min_x), df(min_x));
+
+% Use MATLAB's fminunc
+options = optimoptions('fminunc', 'Display', 'iter', 'OptimalityTolerance', 1e-10);
+[x_fminunc, fval, exitflag, output] = fminunc(@(x) -f(x), x0_1, options);  % Maximize f by minimizing -f
+
+fprintf('\nMaximum found by MATLAB''s fminunc:\n');
+fprintf('x = %.10f, f(x) = %.10f, f''(x) = %.2e\n', x_fminunc, f(x_fminunc), df(x_fminunc));
+
+% Mark optimization results on the plot
+plot(min_x, f(min_x), 'ms', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Minimum (Newton)');
+plot(x_fminunc, f(x_fminunc), 'cs', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Maximum (fminunc)');
+legend('show');
+
+% Plot convergence
+figure;
+subplot(1, 2, 1);
+semilogy(0:min_iter, abs(min_conv - min_x), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Modified Newton''s Method for Minimization');
+grid on;
+
+subplot(1, 2, 2);
+semilogy(0:iter1, abs(conv1 - cp1), 'o-', 'LineWidth', 1.5);
+xlabel('Iteration');
+ylabel('Error');
+title('Convergence of Newton''s Method for Critical Point');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up solution toggles
+            toggleSolution('newton-problem1-btn', 'newton-problem1-solution');
+            toggleSolution('newton-problem2-btn', 'newton-problem2-solution');
+            toggleSolution('newton-problem3-btn', 'newton-problem3-solution');
+        });
+    </script>
+</body>
+</html>

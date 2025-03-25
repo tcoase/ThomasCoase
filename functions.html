@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions in MATLAB - MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html" class="active">Functions</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="intro">
+                <h2>Functions in MATLAB</h2>
+                <p>Functions are the building blocks of modular, reusable code in MATLAB. They allow you to encapsulate operations, calculations, and algorithms into self-contained units that can be called from anywhere in your program. Understanding how to create and use functions effectively is essential for computational engineering applications.</p>
+                
+                <p>In this guide, we'll explore MATLAB's function capabilities, from basic syntax to advanced techniques, with practical examples demonstrating their application in computational engineering problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Function Basics</h3>
+                
+                <h4>Function Syntax and Structure</h4>
+                <p>MATLAB functions are defined in separate files with a <code>.m</code> extension, where the filename matches the function name. The basic structure of a MATLAB function is:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [output1, output2, ...] = function_name(input1, input2, ...)
+    % Function description
+    % This section is the help text that appears when using help function_name
+    
+    % Function body - code that performs the actual operations
+    
+    % Assign values to output variables
+    output1 = ...;
+    output2 = ...;
+end</code></pre>
+                </div>
+                
+                <p>Let's create a simple function that calculates the area and perimeter of a rectangle:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [area, perimeter] = rectangle_properties(length, width)
+    % RECTANGLE_PROPERTIES Calculate area and perimeter of a rectangle
+    %   [AREA, PERIMETER] = RECTANGLE_PROPERTIES(LENGTH, WIDTH) returns
+    %   the area and perimeter of a rectangle with the given dimensions.
+    
+    % Input validation
+    if length <= 0 || width <= 0
+        error('Length and width must be positive values');
+    end
+    
+    % Calculate area
+    area = length * width;
+    
+    % Calculate perimeter
+    perimeter = 2 * (length + width);
+end</code></pre>
+                </div>
+                
+                <p>To use this function, save it in a file named <code>rectangle_properties.m</code> and call it from your MATLAB script or command window:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Call the function with specific values
+[a, p] = rectangle_properties(5, 3);
+fprintf('Area: %.2f square units\n', a);
+fprintf('Perimeter: %.2f units\n', p);
+
+% Call with different values
+[area2, perimeter2] = rectangle_properties(10, 7);
+fprintf('Area: %.2f square units\n', area2);
+fprintf('Perimeter: %.2f units\n', perimeter2);</code></pre>
+                </div>
+                
+                <h4>Function Documentation</h4>
+                <p>Good documentation is crucial for making your functions usable by others (and by your future self). MATLAB provides a structured way to document functions using the help text:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = example_function(x, y, varargin)
+    % EXAMPLE_FUNCTION A well-documented example function
+    %   RESULT = EXAMPLE_FUNCTION(X, Y) computes a result based on inputs X and Y.
+    %
+    %   RESULT = EXAMPLE_FUNCTION(X, Y, 'Parameter', Value, ...) allows
+    %   specifying additional parameters:
+    %
+    %   Parameters:
+    %       'Method' - Calculation method to use: 'fast' or 'accurate'
+    %                  Default: 'fast'
+    %       'MaxIter' - Maximum number of iterations
+    %                  Default: 100
+    %
+    %   Examples:
+    %       result = example_function(1, 2)
+    %       result = example_function(1, 2, 'Method', 'accurate', 'MaxIter', 500)
+    %
+    %   See also OTHER_FUNCTION, RELATED_FUNCTION
+    
+    % Author: Your Name
+    % Date: March 2025
+    % Version: 1.0
+    
+    % Function implementation...
+end</code></pre>
+                </div>
+                
+                <p>With this documentation, users can get help by typing <code>help example_function</code> in the MATLAB command window.</p>
+                
+                <h4>Input and Output Arguments</h4>
+                <p>MATLAB functions can have multiple input and output arguments:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Function with multiple inputs and outputs
+function [mean_val, std_val, min_val, max_val] = data_stats(data, weights)
+    % DATA_STATS Calculate basic statistics of a data set
+    %   [MEAN, STD, MIN, MAX] = DATA_STATS(DATA) calculates the mean,
+    %   standard deviation, minimum, and maximum of the input data.
+    %
+    %   [MEAN, STD, MIN, MAX] = DATA_STATS(DATA, WEIGHTS) calculates
+    %   weighted statistics using the provided weights.
+    
+    % Check if weights are provided
+    if nargin < 2
+        % Unweighted statistics
+        mean_val = mean(data);
+        std_val = std(data);
+    else
+        % Weighted statistics
+        % Ensure weights are normalized
+        weights = weights / sum(weights);
+        
+        % Calculate weighted mean
+        mean_val = sum(data .* weights);
+        
+        % Calculate weighted standard deviation
+        std_val = sqrt(sum(weights .* (data - mean_val).^2));
+    end
+    
+    % Min and max are the same regardless of weights
+    min_val = min(data);
+    max_val = max(data);
+end</code></pre>
+                </div>
+                
+                <p>You can call this function with different numbers of output arguments:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Generate sample data
+data = randn(1, 100);  % 100 random numbers from normal distribution
+
+% Get all statistics
+[mean_val, std_val, min_val, max_val] = data_stats(data);
+fprintf('Mean: %.4f, Std: %.4f, Min: %.4f, Max: %.4f\n', ...
+        mean_val, std_val, min_val, max_val);
+
+% Get only mean and standard deviation
+[mean_val, std_val] = data_stats(data);
+fprintf('Mean: %.4f, Std: %.4f\n', mean_val, std_val);
+
+% Get only the mean
+mean_val = data_stats(data);
+fprintf('Mean: %.4f\n', mean_val);</code></pre>
+                </div>
+                
+                <h4>Variable Number of Input Arguments</h4>
+                <p>MATLAB allows functions to accept a variable number of input arguments using <code>varargin</code>:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = flexible_function(required_arg, varargin)
+    % FLEXIBLE_FUNCTION Function with variable number of inputs
+    %   RESULT = FLEXIBLE_FUNCTION(REQUIRED_ARG) uses default settings
+    %   RESULT = FLEXIBLE_FUNCTION(REQUIRED_ARG, 'param1', value1, ...) 
+    %   allows specifying additional parameters
+    
+    % Set default parameters
+    options = struct('Method', 'default', 'MaxIter', 100, 'Tolerance', 1e-6);
+    
+    % Process varargin
+    for i = 1:2:length(varargin)
+        if i+1 <= length(varargin)
+            param_name = varargin{i};
+            param_value = varargin{i+1};
+            
+            % Check if the parameter name is valid
+            if isfield(options, param_name)
+                options.(param_name) = param_value;
+            else
+                warning('Unknown parameter: %s', param_name);
+            end
+        end
+    end
+    
+    % Function implementation using required_arg and options
+    fprintf('Required argument: %d\n', required_arg);
+    fprintf('Method: %s\n', options.Method);
+    fprintf('MaxIter: %d\n', options.MaxIter);
+    fprintf('Tolerance: %.2e\n', options.Tolerance);
+    
+    % Placeholder result
+    result = required_arg;
+end</code></pre>
+                </div>
+                
+                <p>You can call this function with different numbers of arguments:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Call with only the required argument
+result1 = flexible_function(42);
+
+% Call with additional parameters
+result2 = flexible_function(42, 'Method', 'advanced', 'Tolerance', 1e-8);
+
+% Call with an unknown parameter (will generate a warning)
+result3 = flexible_function(42, 'UnknownParam', 'value');</code></pre>
+                </div>
+                
+                <h4>Variable Number of Output Arguments</h4>
+                <p>Similarly, MATLAB allows functions to return a variable number of outputs using <code>varargout</code>:</p>
+                
+                <div class="code-example">
+                    <pre><code>function varargout = multi_output_function(x, num_outputs)
+    % MULTI_OUTPUT_FUNCTION Function with variable number of outputs
+    %   [OUT1] = MULTI_OUTPUT_FUNCTION(X, 1) returns one output
+    %   [OUT1, OUT2] = MULTI_OUTPUT_FUNCTION(X, 2) returns two outputs
+    %   [OUT1, OUT2, OUT3] = MULTI_OUTPUT_FUNCTION(X, 3) returns three outputs
+    
+    % Check if number of outputs is specified
+    if nargin < 2
+        num_outputs = nargout;  % Use the number of outputs requested by caller
+    end
+    
+    % Limit the number of outputs
+    num_outputs = min(num_outputs, 3);
+    
+    % Prepare outputs
+    outputs = cell(1, num_outputs);
+    
+    % Assign values to outputs
+    if num_outputs >= 1
+        outputs{1} = x^2;  % Square
+    end
+    
+    if num_outputs >= 2
+        outputs{2} = x^3;  % Cube
+    end
+    
+    if num_outputs >= 3
+        outputs{3} = sqrt(x);  % Square root
+    end
+    
+    % Assign to varargout
+    varargout = outputs;
+end</code></pre>
+                </div>
+                
+                <p>You can call this function with different numbers of output arguments:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Call with one output
+y1 = multi_output_function(4);
+fprintf('y1 = %.2f\n', y1);
+
+% Call with two outputs
+[y1, y2] = multi_output_function(4);
+fprintf('y1 = %.2f, y2 = %.2f\n', y1, y2);
+
+% Call with three outputs
+[y1, y2, y3] = multi_output_function(4);
+fprintf('y1 = %.2f, y2 = %.2f, y3 = %.2f\n', y1, y2, y3);
+
+% Explicitly specify number of outputs
+[y1, y2] = multi_output_function(4, 2);
+fprintf('y1 = %.2f, y2 = %.2f\n', y1, y2);</code></pre>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h3>Function Types in MATLAB</h3>
+                
+                <h4>Script Files vs. Function Files</h4>
+                <p>MATLAB has two main types of code files:</p>
+                
+                <ul>
+                    <li><strong>Script files</strong>: Simple .m files that execute a series of MATLAB commands. They operate in the base workspace and don't have their own scope.</li>
+                    <li><strong>Function files</strong>: .m files that define functions. They have their own workspace separate from the base workspace.</li>
+                </ul>
+                
+                <p>Here's a comparison:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Example script file (my_script.m)
+% Scripts operate in the base workspace
+x = 10;
+y = 20;
+z = x + y;
+disp(['Result: ' num2str(z)]);
+
+% Example function file (my_function.m)
+function my_function()
+    % Functions have their own workspace
+    x = 10;
+    y = 20;
+    z = x + y;
+    disp(['Result: ' num2str(z)]);
+end</code></pre>
+                </div>
+                
+                <p>The key difference is that variables in scripts are accessible after running the script, while variables in functions are not:</p>
+                
+                <div class="code-example">
+                    <pre><code>% After running my_script.m
+disp(['x from script: ' num2str(x)]);  % Works, x is in base workspace
+
+% After running my_function.m
+% disp(['x from function: ' num2str(x)]);  % Error, x is not in base workspace</code></pre>
+                </div>
+                
+                <h4>Local Functions</h4>
+                <p>MATLAB allows you to define multiple functions in a single file. The first function is the main function (accessible from outside), and subsequent functions are local functions (only accessible within the file):</p>
+                
+                <div class="code-example">
+                    <pre><code>function main_result = main_function(x)
+    % MAIN_FUNCTION This is the main function in the file
+    %   This function can be called from outside the file
+    
+    % Call local functions
+    a = local_function1(x);
+    b = local_function2(x);
+    
+    % Combine results
+    main_result = a + b;
+end
+
+function result1 = local_function1(x)
+    % This is a local function, only accessible within this file
+    result1 = x^2;
+end
+
+function result2 = local_function2(x)
+    % This is another local function
+    result2 = x^3;
+end</code></pre>
+                </div>
+                
+                <p>Local functions are useful for organizing code and breaking down complex tasks into smaller, manageable pieces.</p>
+                
+                <h4>Nested Functions</h4>
+                <p>MATLAB also supports nested functions, which are functions defined inside other functions:</p>
+                
+                <div class="code-example">
+                    <pre><code>function outer_result = outer_function(x)
+    % OUTER_FUNCTION Function with nested functions
+    
+    % Variables in the outer function are accessible to nested functions
+    outer_var = x * 2;
+    
+    % Call the nested function
+    inner_result = inner_function(x);
+    
+    % Combine results
+    outer_result = outer_var + inner_result;
+    
+    % Nested function definition
+    function result = inner_function(y)
+        % This nested function can access variables from outer_function
+        result = outer_var * y;
+    end
+end</code></pre>
+                </div>
+                
+                <p>Nested functions have access to variables in their parent functions, which can be useful for sharing data without passing it as arguments.</p>
+                
+                <h4>Private Functions</h4>
+                <p>Private functions are stored in a special folder named 'private' and are only accessible to functions in the parent folder:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Directory structure:
+% /my_project/
+%     my_function.m
+%     /private/
+%         helper_function.m
+
+% In my_function.m
+function result = my_function(x)
+    % This function can call helper_function
+    result = helper_function(x);
+end
+
+% In private/helper_function.m
+function result = helper_function(x)
+    % This function is only accessible to functions in the parent folder
+    result = x^2;
+end</code></pre>
+                </div>
+                
+                <p>Private functions are useful for hiding implementation details and preventing other code from directly accessing helper functions.</p>
+                
+                <h4>Anonymous Functions</h4>
+                <p>Anonymous functions are defined without creating a separate file, making them convenient for simple operations:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define an anonymous function
+square = @(x) x.^2;
+
+% Use the anonymous function
+y = square(1:5);
+disp(y);  % Output: 1 4 9 16 25
+
+% Anonymous function with multiple inputs
+distance = @(x1, y1, x2, y2) sqrt((x2-x1)^2 + (y2-y1)^2);
+
+% Use the function
+d = distance(0, 0, 3, 4);
+disp(['Distance: ' num2str(d)]);  % Output: Distance: 5
+
+% Anonymous function that captures variables from the workspace
+a = 2;
+b = 3;
+f = @(x) a*x^2 + b*x + 1;
+
+% Use the function
+y = f(2);
+disp(['f(2) = ' num2str(y)]);  % Output: f(2) = 15
+
+% The function captures the values of a and b at creation time
+a = 5;  % Changing a doesn't affect the function
+y = f(2);
+disp(['f(2) after changing a = ' num2str(y)]);  % Still outputs: f(2) = 15</code></pre>
+                </div>
+                
+                <p>Anonymous functions are particularly useful for passing functions as arguments to other functions, such as <code>fzero</code>, <code>integral</code>, or <code>fminbnd</code>.</p>
+                
+                <h4>Function Handles</h4>
+                <p>Function handles are references to functions, allowing you to pass functions as arguments or store them in data structures:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Create function handles
+f1 = @sin;
+f2 = @cos;
+f3 = @(x) x.^2;
+
+% Store function handles in a cell array
+functions = {f1, f2, f3};
+
+% Apply each function to data
+x = linspace(0, 2*pi, 100);
+figure;
+hold on;
+
+for i = 1:length(functions)
+    f = functions{i};
+    y = f(x);
+    plot(x, y);
+end
+
+legend('sin', 'cos', 'x^2');
+xlabel('x');
+ylabel('f(x)');
+title('Multiple Functions');
+grid on;
+
+% Function handle to a named function
+f4 = @sqrt;
+
+% Function handle using function name as string
+f5 = str2func('exp');
+
+% Use function handles with built-in functions
+f = @(x) sin(x) - 0.5;
+root = fzero(f, 0.5);
+fprintf('Root of sin(x) - 0.5 = 0: %.6f\n', root);
+
+area = integral(@(x) sin(x), 0, pi);
+fprintf('Integral of sin(x) from 0 to pi: %.6f\n', area);</code></pre>
+                </div>
+                
+                <p>Function handles are essential for implementing numerical methods that require function evaluations, such as root-finding, optimization, or integration algorithms.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Advanced Function Techniques</h3>
+                
+                <h4>Function Workspaces and Variable Scope</h4>
+                <p>Understanding variable scope is crucial for writing effective MATLAB functions:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Global variables (accessible everywhere)
+global shared_var;
+shared_var = 42;
+
+function demo_scope()
+    % Local variables (only accessible within this function)
+    local_var = 10;
+    
+    % Access global variable
+    global shared_var;
+    disp(['Global variable: ' num2str(shared_var)]);
+    
+    % Call nested function
+    nested_function();
+    
+    % Nested function
+    function nested_function()
+        % Can access variables from parent function
+        disp(['Local variable from parent: ' num2str(local_var)]);
+        
+        % Can modify parent variables
+        local_var = local_var + 1;
+        
+        % Can access global variables
+        disp(['Global variable in nested: ' num2str(shared_var)]);
+    end
+end</code></pre>
+                </div>
+                
+                <p>Variables have different scopes:</p>
+                <ul>
+                    <li><strong>Global variables</strong>: Accessible from any function that declares them with <code>global</code></li>
+                    <li><strong>Persistent variables</strong>: Retain their values between function calls</li>
+                    <li><strong>Local variables</strong>: Only accessible within the function where they're defined</li>
+                    <li><strong>Nested function variables</strong>: Can access variables from parent functions</li>
+                </ul>
+                
+                <h4>Persistent Variables</h4>
+                <p>Persistent variables retain their values between function calls:</p>
+                
+                <div class="code-example">
+                    <pre><code>function count = counter()
+    % COUNTER Function that counts how many times it's been called
+    
+    % Declare persistent variable
+    persistent call_count;
+    
+    % Initialize on first call
+    if isempty(call_count)
+        call_count = 0;
+    end
+    
+    % Increment counter
+    call_count = call_count + 1;
+    
+    % Return current count
+    count = call_count;
+end
+
+% Usage:
+% c1 = counter()  % Returns 1
+% c2 = counter()  % Returns 2
+% c3 = counter()  % Returns 3</code></pre>
+                </div>
+                
+                <p>Persistent variables are useful for maintaining state between function calls without using global variables.</p>
+                
+                <h4>Function Recursion</h4>
+                <p>MATLAB functions can call themselves recursively, which is useful for problems that can be broken down into smaller instances of the same problem:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = factorial_recursive(n)
+    % FACTORIAL_RECURSIVE Calculate factorial using recursion
+    %   FACTORIAL_RECURSIVE(N) calculates N! recursively
+    
+    % Input validation
+    if n < 0 || n ~= floor(n)
+        error('Input must be a non-negative integer');
+    end
+    
+    % Base case
+    if n == 0 || n == 1
+        result = 1;
+        return;
+    end
+    
+    % Recursive case
+    result = n * factorial_recursive(n - 1);
+end
+
+% Usage:
+% f5 = factorial_recursive(5)  % Returns 120</code></pre>
+                </div>
+                
+                <p>Another classic example is the Fibonacci sequence:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = fibonacci_recursive(n)
+    % FIBONACCI_RECURSIVE Calculate Fibonacci number using recursion
+    %   FIBONACCI_RECURSIVE(N) calculates the Nth Fibonacci number
+    
+    % Input validation
+    if n < 0 || n ~= floor(n)
+        error('Input must be a non-negative integer');
+    end
+    
+    % Base cases
+    if n == 0
+        result = 0;
+        return;
+    elseif n == 1
+        result = 1;
+        return;
+    end
+    
+    % Recursive case
+    result = fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2);
+end
+
+% Note: This implementation is inefficient for large n
+% A better approach would use memoization or an iterative solution</code></pre>
+                </div>
+                
+                <h4>Function Optimization</h4>
+                <p>For computationally intensive functions, optimization is important:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Inefficient implementation
+function result = slow_fibonacci(n)
+    if n <= 1
+        result = n;
+    else
+        result = slow_fibonacci(n-1) + slow_fibonacci(n-2);
+    end
+end
+
+% Optimized implementation using memoization
+function result = fast_fibonacci(n)
+    persistent memo;
+    
+    % Initialize memoization cache
+    if isempty(memo)
+        memo = containers.Map('KeyType', 'double', 'ValueType', 'double');
+        memo(0) = 0;
+        memo(1) = 1;
+    end
+    
+    % Check if result is already cached
+    if isKey(memo, n)
+        result = memo(n);
+        return;
+    end
+    
+    % Calculate and cache result
+    result = fast_fibonacci(n-1) + fast_fibonacci(n-2);
+    memo(n) = result;
+end
+
+% Iterative implementation (even faster)
+function result = iterative_fibonacci(n)
+    if n <= 1
+        result = n;
+        return;
+    end
+    
+    a = 0;
+    b = 1;
+    
+    for i = 2:n
+        temp = a + b;
+        a = b;
+        b = temp;
+    end
+    
+    result = b;
+end</code></pre>
+                </div>
+                
+                <p>Performance comparison:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Compare performance
+n = 30;
+
+tic;
+slow_result = slow_fibonacci(n);
+slow_time = toc;
+fprintf('Slow recursive: %.6f seconds\n', slow_time);
+
+tic;
+fast_result = fast_fibonacci(n);
+fast_time = toc;
+fprintf('Memoized recursive: %.6f seconds\n', fast_time);
+
+tic;
+iter_result = iterative_fibonacci(n);
+iter_time = toc;
+fprintf('Iterative: %.6f seconds\n', iter_time);
+
+fprintf('Results: %d = %d = %d\n', slow_result, fast_result, iter_result);</code></pre>
+                </div>
+                
+                <h4>Function Profiling</h4>
+                <p>MATLAB provides tools for profiling function performance:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Profile a function
+profile on;
+result = my_function(input_data);
+profile off;
+profile viewer;  % Opens the profiler GUI
+
+% Or use the profile report
+profile report;</code></pre>
+                </div>
+                
+                <p>The profiler helps identify bottlenecks in your code, showing which functions or lines take the most time.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Function Organization and Best Practices</h3>
+                
+                <h4>Function Organization</h4>
+                <p>Organizing your functions effectively is crucial for maintainable code:</p>
+                
+                <ul>
+                    <li><strong>One function per file</strong> for main functions</li>
+                    <li>Use <strong>local functions</strong> for helper functions that are only used by the main function</li>
+                    <li>Create <strong>private folders</strong> for functions that should only be accessible to a specific set of functions</li>
+                    <li>Use <strong>packages</strong> for organizing related functions into namespaces</li>
+                </ul>
+                
+                <h4>MATLAB Packages</h4>
+                <p>Packages provide a way to organize functions into namespaces:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Directory structure:
+% /+mypackage/
+%     function1.m
+%     function2.m
+%     /+subpackage/
+%         function3.m
+
+% To use these functions:
+result1 = mypackage.function1(args);
+result2 = mypackage.function2(args);
+result3 = mypackage.subpackage.function3(args);</code></pre>
+                </div>
+                
+                <p>Packages help avoid naming conflicts and organize related functionality.</p>
+                
+                <h4>Function Naming Conventions</h4>
+                <p>Consistent naming makes your code more readable and maintainable:</p>
+                
+                <ul>
+                    <li>Use <strong>lowerCamelCase</strong> for function names (e.g., <code>calculateDistance</code>)</li>
+                    <li>Use <strong>descriptive names</strong> that indicate what the function does</li>
+                    <li>Use <strong>verb phrases</strong> for functions that perform actions (e.g., <code>calculateGradient</code>, <code>solveEquation</code>)</li>
+                    <li>Use <strong>noun phrases</strong> for functions that return data (e.g., <code>eigenvalues</code>, <code>meanSquareError</code>)</li>
+                </ul>
+                
+                <h4>Input Validation</h4>
+                <p>Robust functions validate their inputs to prevent errors:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = robust_function(x, y, options)
+    % Input validation
+    
+    % Check if required arguments are provided
+    if nargin < 2
+        error('At least two input arguments are required');
+    end
+    
+    % Check data types
+    if ~isnumeric(x) || ~isnumeric(y)
+        error('Inputs x and y must be numeric');
+    end
+    
+    % Check dimensions
+    if length(x) ~= length(y)
+        error('Inputs x and y must have the same length');
+    end
+    
+    % Set default options
+    if nargin < 3
+        options = struct();
+    end
+    
+    % Set default option values
+    if ~isfield(options, 'Method')
+        options.Method = 'default';
+    end
+    
+    % Validate option values
+    valid_methods = {'default', 'alternative', 'advanced'};
+    if ~ismember(options.Method, valid_methods)
+        error('Invalid method. Valid options are: %s', ...
+              strjoin(valid_methods, ', '));
+    end
+    
+    % Function implementation...
+    result = x + y;  % Placeholder
+end</code></pre>
+                </div>
+                
+                <h4>Error Handling</h4>
+                <p>Proper error handling makes your functions more robust:</p>
+                
+                <div class="code-example">
+                    <pre><code>function result = safe_division(a, b)
+    % SAFE_DIVISION Safely divide a by b with error handling
+    
+    try
+        % Check for division by zero
+        if any(b == 0)
+            error('MATLAB:divideByZero', 'Division by zero encountered');
+        end
+        
+        % Perform division
+        result = a ./ b;
+        
+    catch e
+        % Handle specific errors
+        switch e.identifier
+            case 'MATLAB:divideByZero'
+                warning('Division by zero. Returning Inf for those elements.');
+                result = a ./ b;  % Will automatically give Inf for b==0
+                
+            otherwise
+                % Re-throw unexpected errors
+                rethrow(e);
+        end
+    end
+end</code></pre>
+                </div>
+                
+                <h4>Documentation and Comments</h4>
+                <p>Well-documented functions are easier to use and maintain:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [roots, iterations, converged] = newton_method(f, df, x0, options)
+    % NEWTON_METHOD Find roots using Newton's method
+    %   [ROOTS, ITERATIONS, CONVERGED] = NEWTON_METHOD(F, DF, X0) finds the
+    %   roots of the function F starting from initial guess X0, using the
+    %   derivative function DF.
+    %
+    %   [ROOTS, ITERATIONS, CONVERGED] = NEWTON_METHOD(F, DF, X0, OPTIONS)
+    %   allows specifying additional options:
+    %
+    %   OPTIONS is a structure with the following fields:
+    %       MaxIter - Maximum number of iterations (default: 100)
+    %       Tolerance - Convergence tolerance (default: 1e-6)
+    %       Display - Display level: 'off', 'iter', 'final' (default: 'off')
+    %
+    %   Outputs:
+    %       ROOTS - The found roots
+    %       ITERATIONS - Number of iterations performed
+    %       CONVERGED - Boolean indicating whether the method converged
+    %
+    %   Example:
+    %       f = @(x) x^2 - 2;
+    %       df = @(x) 2*x;
+    %       [root, iter, conv] = newton_method(f, df, 1)
+    %
+    %   See also FZERO, FSOLVE
+    
+    % Author: Your Name
+    % Date: March 2025
+    
+    % Set default options
+    if nargin < 4
+        options = struct();
+    end
+    
+    % Set default option values
+    if ~isfield(options, 'MaxIter')
+        options.MaxIter = 100;
+    end
+    
+    if ~isfield(options, 'Tolerance')
+        options.Tolerance = 1e-6;
+    end
+    
+    if ~isfield(options, 'Display')
+        options.Display = 'off';
+    end
+    
+    % Initialize variables
+    x = x0;
+    iterations = 0;
+    converged = false;
+    
+    % Display header if requested
+    if strcmp(options.Display, 'iter')
+        fprintf('Iter       x          f(x)        Step\n');
+        fprintf('-----------------------------------------\n');
+    end
+    
+    % Main iteration loop
+    for iterations = 1:options.MaxIter
+        % Evaluate function and derivative
+        f_val = f(x);
+        df_val = df(x);
+        
+        % Check for zero derivative
+        if df_val == 0
+            warning('Zero derivative encountered. Stopping iterations.');
+            break;
+        end
+        
+        % Compute next approximation
+        x_new = x - f_val / df_val;
+        step = x_new - x;
+        
+        % Display iteration if requested
+        if strcmp(options.Display, 'iter')
+            fprintf('%4d  %10.6f  %10.6e  %10.6e\n', ...
+                    iterations, x, f_val, step);
+        end
+        
+        % Check for convergence
+        if abs(step) < options.Tolerance || abs(f_val) < options.Tolerance
+            converged = true;
+            x = x_new;
+            break;
+        end
+        
+        % Update x for next iteration
+        x = x_new;
+    end
+    
+    % Display final result if requested
+    if strcmp(options.Display, 'final') || strcmp(options.Display, 'iter')
+        if converged
+            fprintf('Converged to x = %g after %d iterations\n', x, iterations);
+        else
+            fprintf('Failed to converge after %d iterations. Last x = %g\n', ...
+                    iterations, x);
+        end
+    end
+    
+    % Return the root
+    roots = x;
+end</code></pre>
+                </div>
+                
+                <h4>Testing Functions</h4>
+                <p>Testing is essential for ensuring your functions work correctly:</p>
+                
+                <div class="code-example">
+                    <pre><code>function test_newton_method()
+    % TEST_NEWTON_METHOD Test the newton_method function
+    
+    % Test case 1: Simple quadratic function
+    f1 = @(x) x^2 - 2;
+    df1 = @(x) 2*x;
+    expected1 = sqrt(2);
+    
+    [root1, iter1, conv1] = newton_method(f1, df1, 1);
+    error1 = abs(root1 - expected1);
+    
+    fprintf('Test 1: Finding sqrt(2)\n');
+    fprintf('Root: %.10f, Expected: %.10f, Error: %.2e\n', ...
+            root1, expected1, error1);
+    fprintf('Iterations: %d, Converged: %d\n\n', iter1, conv1);
+    
+    % Test case 2: Trigonometric function
+    f2 = @(x) sin(x) - 0.5;
+    df2 = @(x) cos(x);
+    expected2 = asin(0.5);
+    
+    [root2, iter2, conv2] = newton_method(f2, df2, 0.5);
+    error2 = abs(root2 - expected2);
+    
+    fprintf('Test 2: Finding asin(0.5)\n');
+    fprintf('Root: %.10f, Expected: %.10f, Error: %.2e\n', ...
+            root2, expected2, error2);
+    fprintf('Iterations: %d, Converged: %d\n\n', iter2, conv2);
+    
+    % Test case 3: Function with multiple roots
+    f3 = @(x) x^3 - 2*x - 5;
+    df3 = @(x) 3*x^2 - 2;
+    
+    % Try different initial guesses
+    initial_guesses = [1, 2, -1];
+    
+    fprintf('Test 3: Cubic equation with multiple roots\n');
+    
+    for i = 1:length(initial_guesses)
+        x0 = initial_guesses(i);
+        [root, iter, conv] = newton_method(f3, df3, x0);
+        
+        fprintf('Initial guess: %.1f, Root: %.10f\n', x0, root);
+        fprintf('f(root): %.2e, Iterations: %d, Converged: %d\n\n', ...
+                f3(root), iter, conv);
+    end
+    
+    % Test case 4: Function with zero derivative
+    f4 = @(x) (x-1)^2;
+    df4 = @(x) 2*(x-1);
+    
+    fprintf('Test 4: Function with zero derivative at x=1\n');
+    
+    % This should generate a warning
+    [root4, iter4, conv4] = newton_method(f4, df4, 1);
+    
+    fprintf('Root: %.10f, Iterations: %d, Converged: %d\n\n', ...
+            root4, iter4, conv4);
+end</code></pre>
+                </div>
+                
+                <p>MATLAB also provides a formal testing framework with the <code>runtests</code> function and test classes.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Practical Examples in Computational Engineering</h3>
+                
+                <h4>Numerical Integration Function</h4>
+                <p>This example shows how to implement the trapezoidal rule for numerical integration:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [integral, error_est] = trapz_integration(f, a, b, n)
+    % TRAPZ_INTEGRATION Numerical integration using the trapezoidal rule
+    %   [INTEGRAL, ERROR_EST] = TRAPZ_INTEGRATION(F, A, B, N) computes the
+    %   integral of function F from A to B using N intervals.
+    %
+    %   Inputs:
+    %       F - Function handle
+    %       A, B - Integration limits
+    %       N - Number of intervals
+    %
+    %   Outputs:
+    %       INTEGRAL - Approximation of the integral
+    %       ERROR_EST - Estimated error
+    
+    % Input validation
+    if nargin < 4
+        n = 100;  % Default number of intervals
+    end
+    
+    if ~isa(f, 'function_handle')
+        error('First argument must be a function handle');
+    end
+    
+    if ~isscalar(a) || ~isscalar(b)
+        error('Integration limits must be scalars');
+    end
+    
+    if ~isscalar(n) || n <= 0 || n ~= floor(n)
+        error('Number of intervals must be a positive integer');
+    end
+    
+    % Compute step size
+    h = (b - a) / n;
+    
+    % Generate grid points
+    x = a:h:b;
+    
+    % Evaluate function at grid points
+    y = zeros(size(x));
+    for i = 1:length(x)
+        y(i) = f(x(i));
+    end
+    
+    % Apply trapezoidal rule
+    integral = h * (0.5*y(1) + sum(y(2:end-1)) + 0.5*y(end));
+    
+    % Estimate error (if possible)
+    if nargout > 1
+        % Compute with twice the number of intervals
+        [integral_refined, ~] = trapz_integration(f, a, b, 2*n);
+        
+        % Estimate error using Richardson extrapolation
+        error_est = abs(integral - integral_refined) / 3;
+    end
+end</code></pre>
+                </div>
+                
+                <p>Usage example:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define a function to integrate
+f = @(x) sin(x);
+
+% Compute the integral from 0 to pi
+[result, error] = trapz_integration(f, 0, pi, 100);
+
+% Display results
+fprintf('Integral of sin(x) from 0 to pi:\n');
+fprintf('Numerical result: %.10f\n', result);
+fprintf('Exact result: %.10f\n', 2.0);
+fprintf('Absolute error: %.2e\n', abs(result - 2.0));
+fprintf('Estimated error: %.2e\n', error);</code></pre>
+                </div>
+                
+                <h4>Ordinary Differential Equation Solver</h4>
+                <p>This example implements a simple ODE solver using the Runge-Kutta method:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = rk4_solver(f, tspan, y0, h)
+    % RK4_SOLVER Solve ordinary differential equations using RK4 method
+    %   [T, Y] = RK4_SOLVER(F, TSPAN, Y0, H) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using step size H.
+    %
+    %   Inputs:
+    %       F - Function handle representing the ODE: dy/dt = F(t, y)
+    %       TSPAN - [T0, TFINAL] integration interval
+    %       Y0 - Initial condition
+    %       H - Step size
+    %
+    %   Outputs:
+    %       T - Time points
+    %       Y - Solution values at time points
+    
+    % Input validation
+    if ~isa(f, 'function_handle')
+        error('First argument must be a function handle');
+    end
+    
+    if length(tspan) ~= 2
+        error('TSPAN must be a 2-element vector [T0, TFINAL]');
+    end
+    
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    if t0 >= tfinal
+        error('Initial time must be less than final time');
+    end
+    
+    if ~isscalar(h) || h <= 0
+        error('Step size must be a positive scalar');
+    end
+    
+    % Adjust step size if needed
+    n_steps = ceil((tfinal - t0) / h);
+    h = (tfinal - t0) / n_steps;
+    
+    % Initialize arrays
+    t = t0:h:tfinal;
+    n = length(t);
+    
+    % Handle scalar or vector y
+    if isscalar(y0)
+        y = zeros(1, n);
+    else
+        y = zeros(length(y0), n);
+    end
+    
+    % Set initial condition
+    y(:, 1) = y0(:);
+    
+    % Main integration loop
+    for i = 1:n-1
+        ti = t(i);
+        yi = y(:, i);
+        
+        % RK4 stages
+        k1 = f(ti, yi);
+        k2 = f(ti + 0.5*h, yi + 0.5*h*k1);
+        k3 = f(ti + 0.5*h, yi + 0.5*h*k2);
+        k4 = f(ti + h, yi + h*k3);
+        
+        % Update solution
+        y(:, i+1) = yi + (h/6) * (k1 + 2*k2 + 2*k3 + k4);
+    end
+    
+    % Transpose y if it's a row vector
+    if size(y, 1) == 1
+        y = y';
+    else
+        y = y';  % Transpose to match MATLAB's ode45 output format
+    end
+end</code></pre>
+                </div>
+                
+                <p>Usage example:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define an ODE: dy/dt = -2y (solution: y = y0*exp(-2t))
+f = @(t, y) -2 * y;
+
+% Solve the ODE
+tspan = [0, 2];
+y0 = 1;
+h = 0.1;
+[t, y] = rk4_solver(f, tspan, y0, h);
+
+% Compute exact solution for comparison
+y_exact = exp(-2 * t);
+
+% Plot results
+figure;
+plot(t, y, 'b-o', 'DisplayName', 'RK4');
+hold on;
+plot(t, y_exact, 'r-', 'DisplayName', 'Exact');
+xlabel('t');
+ylabel('y');
+title('Solution of dy/dt = -2y');
+legend('show');
+grid on;
+
+% Compute error
+error = abs(y - y_exact);
+max_error = max(error);
+fprintf('Maximum absolute error: %.2e\n', max_error);</code></pre>
+                </div>
+                
+                <h4>Finite Difference Method for Heat Equation</h4>
+                <p>This example solves the 1D heat equation using the finite difference method:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [u, x, t] = heat_equation_1d(alpha, L, T, Nx, Nt, IC, BC)
+    % HEAT_EQUATION_1D Solve 1D heat equation using finite differences
+    %   [U, X, T] = HEAT_EQUATION_1D(ALPHA, L, T, NX, NT, IC, BC) solves
+    %   the 1D heat equation: du/dt = alpha * d^2u/dx^2
+    %
+    %   Inputs:
+    %       ALPHA - Thermal diffusivity
+    %       L - Domain length
+    %       T - Final time
+    %       NX - Number of spatial grid points
+    %       NT - Number of time steps
+    %       IC - Function handle for initial condition: u(x, 0) = IC(x)
+    %       BC - Structure with boundary conditions:
+    %            BC.left_type: 'dirichlet' or 'neumann'
+    %            BC.left_value: value at left boundary
+    %            BC.right_type: 'dirichlet' or 'neumann'
+    %            BC.right_value: value at right boundary
+    %
+    %   Outputs:
+    %       U - Solution matrix (Nx x Nt+1)
+    %       X - Spatial grid points
+    %       T - Time points
+    
+    % Spatial grid
+    dx = L / (Nx - 1);
+    x = linspace(0, L, Nx)';
+    
+    % Time grid
+    dt = T / Nt;
+    t = linspace(0, T, Nt + 1);
+    
+    % Check stability condition (CFL)
+    r = alpha * dt / dx^2;
+    if r > 0.5
+        warning(['Stability condition violated: r = %.2f > 0.5\n', ...
+                'Results may be inaccurate. Consider reducing dt or increasing dx.'], r);
+    end
+    
+    % Initialize solution matrix
+    u = zeros(Nx, Nt + 1);
+    
+    % Set initial condition
+    for i = 1:Nx
+        u(i, 1) = IC(x(i));
+    end
+    
+    % Main time-stepping loop
+    for n = 1:Nt
+        % Interior points (explicit scheme)
+        for i = 2:Nx-1
+            u(i, n+1) = u(i, n) + r * (u(i+1, n) - 2*u(i, n) + u(i-1, n));
+        end
+        
+        % Left boundary
+        if strcmpi(BC.left_type, 'dirichlet')
+            % Dirichlet: u(0, t) = BC.left_value
+            u(1, n+1) = BC.left_value;
+        else
+            % Neumann: du/dx(0, t) = BC.left_value
+            % Use ghost point method
+            u(1, n+1) = u(2, n+1) - dx * BC.left_value;
+        end
+        
+        % Right boundary
+        if strcmpi(BC.right_type, 'dirichlet')
+            % Dirichlet: u(L, t) = BC.right_value
+            u(Nx, n+1) = BC.right_value;
+        else
+            % Neumann: du/dx(L, t) = BC.right_value
+            % Use ghost point method
+            u(Nx, n+1) = u(Nx-1, n+1) + dx * BC.right_value;
+        end
+    end
+end</code></pre>
+                </div>
+                
+                <p>Usage example:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Parameters
+alpha = 0.01;  % Thermal diffusivity
+L = 1.0;       % Domain length
+T = 0.5;       % Final time
+Nx = 50;       % Number of spatial points
+Nt = 1000;     % Number of time steps
+
+% Initial condition: Gaussian pulse
+IC = @(x) exp(-(x - L/2)^2 / 0.01);
+
+% Boundary conditions: Insulated (Neumann with zero flux)
+BC = struct('left_type', 'neumann', 'left_value', 0, ...
+            'right_type', 'neumann', 'right_value', 0);
+
+% Solve the heat equation
+[u, x, t] = heat_equation_1d(alpha, L, T, Nx, Nt, IC, BC);
+
+% Visualize the solution
+figure;
+
+% Plot initial and final temperature profiles
+subplot(2, 1, 1);
+plot(x, u(:, 1), 'b-', 'LineWidth', 2);
+hold on;
+plot(x, u(:, end), 'r-', 'LineWidth', 2);
+xlabel('Position (x)');
+ylabel('Temperature (u)');
+title('Initial and Final Temperature Profiles');
+legend('Initial', 'Final');
+grid on;
+
+% Create a space-time plot
+subplot(2, 1, 2);
+[X, T] = meshgrid(t, x);
+surf(T, X, u);
+xlabel('Time (t)');
+ylabel('Position (x)');
+zlabel('Temperature (u)');
+title('Heat Equation Solution');
+colorbar;
+view(2);  % Top-down view
+shading interp;</code></pre>
+                </div>
+            </section>
+            
+            <section class="practice-problems">
+                <h3>Practice Problems</h3>
+                
+                <div class="problem-card">
+                    <h4>Problem 1: Function Handles and Numerical Integration</h4>
+                    <p>Create a function that compares different numerical integration methods (trapezoidal rule, Simpson's rule, and MATLAB's built-in <code>integral</code> function) for a given function over a specified interval. The function should:</p>
+                    <ol>
+                        <li>Accept a function handle, integration limits, and number of intervals as inputs</li>
+                        <li>Implement the trapezoidal rule and Simpson's rule</li>
+                        <li>Compare the results with MATLAB's <code>integral</code> function</li>
+                        <li>Return a structure with the results and errors</li>
+                        <li>Include an option to plot the function and visualize the integration methods</li>
+                    </ol>
+                    
+                    <button id="function-problem1-btn" class="btn">Show Solution</button>
+                    
+                    <div id="function-problem1-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>function results = compare_integration_methods(f, a, b, n, plot_flag)
+    % COMPARE_INTEGRATION_METHODS Compare different numerical integration methods
+    %   RESULTS = COMPARE_INTEGRATION_METHODS(F, A, B, N) compares the
+    %   trapezoidal rule, Simpson's rule, and MATLAB's integral function
+    %   for integrating F from A to B using N intervals.
+    %
+    %   RESULTS = COMPARE_INTEGRATION_METHODS(F, A, B, N, PLOT_FLAG) also
+    %   creates a visualization if PLOT_FLAG is true.
+    
+    % Input validation
+    if nargin < 5
+        plot_flag = false;
+    end
+    
+    if ~isa(f, 'function_handle')
+        error('First argument must be a function handle');
+    end
+    
+    % Compute exact integral using MATLAB's built-in function
+    exact = integral(f, a, b);
+    
+    % Compute step size
+    h = (b - a) / n;
+    
+    % Generate grid points
+    x = a:h:b;
+    
+    % Evaluate function at grid points
+    y = zeros(size(x));
+    for i = 1:length(x)
+        y(i) = f(x(i));
+    end
+    
+    % Trapezoidal rule
+    trap = h * (0.5*y(1) + sum(y(2:end-1)) + 0.5*y(end));
+    
+    % Simpson's rule (requires even number of intervals)
+    if mod(n, 2) == 0
+        % Even number of intervals
+        simp = (h/3) * (y(1) + 4*sum(y(2:2:end-1)) + 2*sum(y(3:2:end-2)) + y(end));
+    else
+        % Odd number of intervals - use composite Simpson's rule with trapezoidal rule for last interval
+        simp = (h/3) * (y(1) + 4*sum(y(2:2:end-2)) + 2*sum(y(3:2:end-3)) + y(end-1));
+        simp = simp + (h/2) * (y(end-1) + y(end));
+        warning('Odd number of intervals. Using composite Simpson''s rule with trapezoidal rule for last interval.');
+    end
+    
+    % Compute errors
+    trap_error = abs(trap - exact);
+    simp_error = abs(simp - exact);
+    
+    % Store results
+    results = struct();
+    results.exact = exact;
+    results.trapezoidal = trap;
+    results.simpson = simp;
+    results.trap_error = trap_error;
+    results.simp_error = simp_error;
+    results.trap_rel_error = trap_error / abs(exact) * 100;  % Percentage
+    results.simp_rel_error = simp_error / abs(exact) * 100;  % Percentage
+    
+    % Display results
+    fprintf('Integration of f(x) from %.2f to %.2f using %d intervals:\n', a, b, n);
+    fprintf('Exact (integral):     %.10f\n', exact);
+    fprintf('Trapezoidal rule:     %.10f (error: %.2e, %.2f%%)\n', ...
+            trap, trap_error, results.trap_rel_error);
+    fprintf('Simpson''s rule:       %.10f (error: %.2e, %.2f%%)\n', ...
+            simp, simp_error, results.simp_rel_error);
+    
+    % Create visualization if requested
+    if plot_flag
+        % Create a finer grid for plotting the function
+        x_fine = linspace(a, b, 1000);
+        y_fine = arrayfun(f, x_fine);
+        
+        % Create figure
+        figure;
+        
+        % Plot the function
+        subplot(2, 1, 1);
+        plot(x_fine, y_fine, 'b-', 'LineWidth', 2);
+        xlabel('x');
+        ylabel('f(x)');
+        title('Function to Integrate');
+        grid on;
+        
+        % Plot the approximations
+        subplot(2, 1, 2);
+        
+        % Trapezoidal rule visualization
+        plot(x, y, 'ro-', 'DisplayName', 'Function Values');
+        hold on;
+        
+        % Draw trapezoids
+        for i = 1:length(x)-1
+            % Draw the trapezoid
+            fill([x(i), x(i), x(i+1), x(i+1)], [0, y(i), y(i+1), 0], 'g', ...
+                 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+        end
+        
+        % Add legend and labels
+        plot(NaN, NaN, 'g', 'FaceAlpha', 0.3, 'DisplayName', 'Trapezoidal Rule');
+        xlabel('x');
+        ylabel('f(x)');
+        title('Numerical Integration Approximation');
+        legend('show');
+        grid on;
+        
+        % Add text with results
+        text(a + 0.1*(b-a), min(y) + 0.8*(max(y)-min(y)), ...
+             sprintf('Exact: %.6f\nTrap: %.6f (%.2f%%)\nSimp: %.6f (%.2f%%)', ...
+                    exact, trap, results.trap_rel_error, simp, results.simp_rel_error), ...
+             'FontSize', 9, 'BackgroundColor', [1 1 1 0.7]);
+    end
+end
+
+% Example usage:
+% f = @(x) sin(x);
+% results = compare_integration_methods(f, 0, pi, 10, true);
+%
+% f2 = @(x) 1 ./ (1 + x.^2);
+% results2 = compare_integration_methods(f2, 0, 5, 20, true);</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 2: Recursive Function for Matrix Operations</h4>
+                    <p>Create a recursive function that computes the determinant of a matrix using the cofactor expansion method. The function should:</p>
+                    <ol>
+                        <li>Accept a square matrix as input</li>
+                        <li>Implement the cofactor expansion method recursively</li>
+                        <li>Include base cases for 1×1 and 2×2 matrices</li>
+                        <li>Compare the results with MATLAB's built-in <code>det</code> function</li>
+                        <li>Include error handling for non-square matrices</li>
+                    </ol>
+                    
+                    <button id="function-problem2-btn" class="btn">Show Solution</button>
+                    
+                    <div id="function-problem2-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>function det_val = recursive_determinant(A)
+    % RECURSIVE_DETERMINANT Compute determinant using cofactor expansion
+    %   DET_VAL = RECURSIVE_DETERMINANT(A) computes the determinant of
+    %   matrix A using the cofactor expansion method.
+    
+    % Input validation
+    [m, n] = size(A);
+    
+    if m ~= n
+        error('Input must be a square matrix');
+    end
+    
+    % Base case 1: 1x1 matrix
+    if m == 1
+        det_val = A(1, 1);
+        return;
+    end
+    
+    % Base case 2: 2x2 matrix
+    if m == 2
+        det_val = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1);
+        return;
+    end
+    
+    % Recursive case: cofactor expansion along first row
+    det_val = 0;
+    for j = 1:n
+        % Get the submatrix by removing first row and j-th column
+        submatrix = A(2:end, [1:j-1, j+1:end]);
+        
+        % Compute the cofactor
+        cofactor = A(1, j) * recursive_determinant(submatrix);
+        
+        % Add to determinant with appropriate sign
+        det_val = det_val + (-1)^(1+j) * cofactor;
+    end
+end
+
+% Test function for recursive determinant
+function test_recursive_determinant()
+    % Test case 1: 2x2 matrix
+    A1 = [2, 3; 4, 5];
+    det1_recursive = recursive_determinant(A1);
+    det1_matlab = det(A1);
+    
+    fprintf('Test 1: 2x2 matrix\n');
+    fprintf('Recursive: %.6f, MATLAB: %.6f, Difference: %.2e\n\n', ...
+            det1_recursive, det1_matlab, abs(det1_recursive - det1_matlab));
+    
+    % Test case 2: 3x3 matrix
+    A2 = [1, 2, 3; 4, 5, 6; 7, 8, 9];
+    det2_recursive = recursive_determinant(A2);
+    det2_matlab = det(A2);
+    
+    fprintf('Test 2: 3x3 matrix\n');
+    fprintf('Recursive: %.6f, MATLAB: %.6f, Difference: %.2e\n\n', ...
+            det2_recursive, det2_matlab, abs(det2_recursive - det2_matlab));
+    
+    % Test case 3: 4x4 matrix
+    A3 = [1, 2, 3, 4; 5, 6, 7, 8; 9, 10, 11, 12; 13, 14, 15, 16];
+    det3_recursive = recursive_determinant(A3);
+    det3_matlab = det(A3);
+    
+    fprintf('Test 3: 4x4 matrix\n');
+    fprintf('Recursive: %.6f, MATLAB: %.6f, Difference: %.2e\n\n', ...
+            det3_recursive, det3_matlab, abs(det3_recursive - det3_matlab));
+    
+    % Test case 4: Random 5x5 matrix
+    A4 = randn(5, 5);
+    
+    % Measure execution time
+    tic;
+    det4_recursive = recursive_determinant(A4);
+    time_recursive = toc;
+    
+    tic;
+    det4_matlab = det(A4);
+    time_matlab = toc;
+    
+    fprintf('Test 4: Random 5x5 matrix\n');
+    fprintf('Recursive: %.6f, MATLAB: %.6f, Difference: %.2e\n', ...
+            det4_recursive, det4_matlab, abs(det4_recursive - det4_matlab));
+    fprintf('Time (recursive): %.6f seconds\n', time_recursive);
+    fprintf('Time (MATLAB): %.6f seconds\n\n', time_matlab);
+    
+    % Test case 5: Error handling for non-square matrix
+    A5 = [1, 2, 3; 4, 5, 6];
+    
+    fprintf('Test 5: Non-square matrix\n');
+    try
+        det5 = recursive_determinant(A5);
+        fprintf('Unexpected: function did not throw an error\n');
+    catch e
+        fprintf('Expected error: %s\n\n', e.message);
+    end
+    
+    % Test case 6: Performance comparison for larger matrices
+    fprintf('Test 6: Performance comparison\n');
+    fprintf('%-10s %-15s %-15s %-15s\n', 'Size', 'Recursive (s)', 'MATLAB (s)', 'Speedup');
+    fprintf('%-10s %-15s %-15s %-15s\n', '----', '------------', '----------', '-------');
+    
+    for n = [2, 3, 4, 5, 6]
+        A = randn(n, n);
+        
+        tic;
+        det_recursive = recursive_determinant(A);
+        time_recursive = toc;
+        
+        tic;
+        det_matlab = det(A);
+        time_matlab = toc;
+        
+        speedup = time_recursive / time_matlab;
+        
+        fprintf('%-10d %-15.6f %-15.6f %-15.2f\n', ...
+                n, time_recursive, time_matlab, speedup);
+    end
+end
+
+% Call the test function
+test_recursive_determinant();</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 3: Function-Based Numerical Solver</h4>
+                    <p>Create a set of functions to solve a system of ordinary differential equations using the Runge-Kutta 4th order method. The system should:</p>
+                    <ol>
+                        <li>Include a main solver function that accepts the ODE system as a function handle</li>
+                        <li>Support systems of arbitrary dimension</li>
+                        <li>Include adaptive step size control</li>
+                        <li>Provide options for different error tolerances and output formats</li>
+                        <li>Include a test case solving the Lorenz system</li>
+                    </ol>
+                    
+                    <button id="function-problem3-btn" class="btn">Show Solution</button>
+                    
+                    <div id="function-problem3-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>function [t, y] = adaptive_rk4_solver(f, tspan, y0, options)
+    % ADAPTIVE_RK4_SOLVER Solve ODE system using adaptive RK4 method
+    %   [T, Y] = ADAPTIVE_RK4_SOLVER(F, TSPAN, Y0) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using adaptive step size control.
+    %
+    %   [T, Y] = ADAPTIVE_RK4_SOLVER(F, TSPAN, Y0, OPTIONS) allows
+    %   specifying additional options:
+    %
+    %   OPTIONS is a structure with the following fields:
+    %       InitialStep - Initial step size (default: (tfinal-t0)/100)
+    %       MaxStep - Maximum step size (default: (tfinal-t0)/10)
+    %       MinStep - Minimum step size (default: (tfinal-t0)/1e6)
+    %       RelTol - Relative tolerance (default: 1e-3)
+    %       AbsTol - Absolute tolerance (default: 1e-6)
+    %       MaxFailed - Maximum number of failed steps (default: 10)
+    %       OutputFcn - Output function handle (default: [])
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Set default options
+    if nargin < 4
+        options = struct();
+    end
+    
+    % Default option values
+    if ~isfield(options, 'InitialStep')
+        options.InitialStep = (tfinal - t0) / 100;
+    end
+    
+    if ~isfield(options, 'MaxStep')
+        options.MaxStep = (tfinal - t0) / 10;
+    end
+    
+    if ~isfield(options, 'MinStep')
+        options.MinStep = (tfinal - t0) / 1e6;
+    end
+    
+    if ~isfield(options, 'RelTol')
+        options.RelTol = 1e-3;
+    end
+    
+    if ~isfield(options, 'AbsTol')
+        options.AbsTol = 1e-6;
+    end
+    
+    if ~isfield(options, 'MaxFailed')
+        options.MaxFailed = 10;
+    end
+    
+    if ~isfield(options, 'OutputFcn')
+        options.OutputFcn = [];
+    end
+    
+    % Initialize solution arrays
+    % Start with some reasonable size and grow as needed
+    chunk_size = 1000;
+    t = zeros(chunk_size, 1);
+    y = zeros(length(y0), chunk_size);
+    
+    % Set initial values
+    t(1) = t0;
+    y(:, 1) = y0(:);
+    
+    % Initialize step size
+    h = options.InitialStep;
+    
+    % Initialize counters
+    step_count = 1;
+    failed_steps = 0;
+    
+    % Main integration loop
+    while t(step_count) < tfinal && failed_steps < options.MaxFailed
+        % Current time and state
+        tc = t(step_count);
+        yc = y(:, step_count);
+        
+        % Ensure we don't go beyond tfinal
+        if tc + h > tfinal
+            h = tfinal - tc;
+        end
+        
+        % Take a step with the current step size
+        [y_new, error_est] = rk4_step_with_error(f, tc, yc, h);
+        
+        % Calculate error metrics
+        scale = max(abs(yc), abs(y_new));
+        scale = max(scale, options.AbsTol / options.RelTol);
+        err = error_est ./ scale;
+        err_norm = sqrt(mean(err.^2));
+        
+        % Check if the step is acceptable
+        if err_norm <= 1
+            % Step accepted
+            
+            % Update solution
+            step_count = step_count + 1;
+            
+            % Resize arrays if needed
+            if step_count > size(t, 1)
+                t = [t; zeros(chunk_size, 1)];
+                y = [y, zeros(length(y0), chunk_size)];
+            end
+            
+            % Store new values
+            t(step_count) = tc + h;
+            y(:, step_count) = y_new;
+            
+            % Call output function if provided
+            if ~isempty(options.OutputFcn)
+                options.OutputFcn(tc + h, y_new);
+            end
+            
+            % Reset failed step counter
+            failed_steps = 0;
+        else
+            % Step rejected
+            failed_steps = failed_steps + 1;
+            
+            if failed_steps >= options.MaxFailed
+                warning('Maximum number of failed steps reached. Integration terminated.');
+                break;
+            end
+        end
+        
+        % Calculate new step size
+        % Use PI controller formula for step size adjustment
+        safety = 0.9;  % Safety factor
+        p = 0.8;       % Error exponent
+        
+        % New step size based on error
+        h_new = safety * h * (1 / err_norm)^p;
+        
+        % Apply constraints
+        h_new = min(h_new, options.MaxStep);
+        h_new = max(h_new, options.MinStep);
+        
+        % Update step size
+        h = h_new;
+    end
+    
+    % Trim unused space
+    t = t(1:step_count);
+    y = y(:, 1:step_count)';  % Transpose to match MATLAB's ode45 output format
+end
+
+function [y_new, error_est] = rk4_step_with_error(f, t, y, h)
+    % RK4_STEP_WITH_ERROR Take one RK4 step and estimate error
+    %   [Y_NEW, ERROR_EST] = RK4_STEP_WITH_ERROR(F, T, Y, H) takes one
+    %   step using the 4th-order Runge-Kutta method and estimates the
+    %   error by comparing with a 5th-order method.
+    
+    % RK4 stages
+    k1 = f(t, y);
+    k2 = f(t + 0.5*h, y + 0.5*h*k1);
+    k3 = f(t + 0.5*h, y + 0.5*h*k2);
+    k4 = f(t + h, y + h*k3);
+    
+    % 4th-order result
+    y_new = y + (h/6) * (k1 + 2*k2 + 2*k3 + k4);
+    
+    % Additional stage for 5th-order method
+    k5 = f(t + h, y_new);
+    
+    % 5th-order result
+    y_higher = y + (h/6) * (k1 + 4*k3 + k5);
+    
+    % Error estimate
+    error_est = abs(y_new - y_higher);
+end
+
+% Example: Solve the Lorenz system
+function test_adaptive_rk4_solver()
+    % Lorenz system parameters
+    sigma = 10;
+    rho = 28;
+    beta = 8/3;
+    
+    % Define the Lorenz system
+    lorenz = @(t, y) [
+        sigma * (y(2) - y(1));
+        y(1) * (rho - y(3)) - y(2);
+        y(1) * y(2) - beta * y(3)
+    ];
+    
+    % Initial condition
+    y0 = [1; 1; 1];
+    
+    % Time span
+    tspan = [0, 20];
+    
+    % Options
+    options = struct();
+    options.RelTol = 1e-6;
+    options.AbsTol = 1e-9;
+    
+    % Create a figure for real-time plotting
+    fig = figure;
+    ax = axes('Parent', fig);
+    h_plot = plot3(ax, NaN, NaN, NaN, 'b-');
+    hold(ax, 'on');
+    xlabel(ax, 'x');
+    ylabel(ax, 'y');
+    zlabel(ax, 'z');
+    title(ax, 'Lorenz Attractor');
+    grid(ax, 'on');
+    view(ax, 3);
+    
+    % Output function for real-time plotting
+    x_data = [];
+    y_data = [];
+    z_data = [];
+    
+    output_fcn = @(t, y) update_plot(t, y, h_plot, x_data, y_data, z_data);
+    options.OutputFcn = output_fcn;
+    
+    % Solve using our adaptive RK4 solver
+    tic;
+    [t_rk4, y_rk4] = adaptive_rk4_solver(lorenz, tspan, y0, options);
+    time_rk4 = toc;
+    
+    fprintf('Adaptive RK4 solver completed in %.6f seconds\n', time_rk4);
+    fprintf('Number of steps: %d\n', length(t_rk4));
+    
+    % Solve using MATLAB's ode45 for comparison
+    tic;
+    [t_ode45, y_ode45] = ode45(lorenz, tspan, y0);
+    time_ode45 = toc;
+    
+    fprintf('MATLAB ode45 completed in %.6f seconds\n', time_ode45);
+    fprintf('Number of steps: %d\n', length(t_ode45));
+    
+    % Plot results
+    figure;
+    
+    % 3D trajectory
+    subplot(2, 2, [1, 3]);
+    plot3(y_rk4(:, 1), y_rk4(:, 2), y_rk4(:, 3), 'b-', 'LineWidth', 1);
+    hold on;
+    plot3(y_ode45(:, 1), y_ode45(:, 2), y_ode45(:, 3), 'r--', 'LineWidth', 1);
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
+    title('Lorenz Attractor');
+    legend('Adaptive RK4', 'ode45');
+    grid on;
+    view(3);
+    
+    % x component
+    subplot(2, 2, 2);
+    plot(t_rk4, y_rk4(:, 1), 'b-', 'LineWidth', 1);
+    hold on;
+    plot(t_ode45, y_ode45(:, 1), 'r--', 'LineWidth', 1);
+    xlabel('Time');
+    ylabel('x');
+    title('x Component');
+    legend('Adaptive RK4', 'ode45');
+    grid on;
+    
+    % z component
+    subplot(2, 2, 4);
+    plot(t_rk4, y_rk4(:, 3), 'b-', 'LineWidth', 1);
+    hold on;
+    plot(t_ode45, y_ode45(:, 3), 'r--', 'LineWidth', 1);
+    xlabel('Time');
+    ylabel('z');
+    title('z Component');
+    legend('Adaptive RK4', 'ode45');
+    grid on;
+    
+    % Calculate difference between solutions
+    % Interpolate to compare at the same time points
+    y_ode45_interp = interp1(t_ode45, y_ode45, t_rk4);
+    diff = abs(y_rk4 - y_ode45_interp);
+    max_diff = max(diff(:));
+    
+    fprintf('Maximum difference between solutions: %.2e\n', max_diff);
+end
+
+function update_plot(t, y, h_plot, x_data, y_data, z_data)
+    % UPDATE_PLOT Update the plot with new data
+    
+    % Append new data
+    x_data = [x_data; y(1)];
+    y_data = [y_data; y(2)];
+    z_data = [z_data; y(3)];
+    
+    % Update plot
+    set(h_plot, 'XData', x_data, 'YData', y_data, 'ZData', z_data);
+    drawnow;
+end
+
+% Call the test function
+test_adaptive_rk4_solver();</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up solution toggles
+            toggleSolution('function-problem1-btn', 'function-problem1-solution');
+            toggleSolution('function-problem2-btn', 'function-problem2-solution');
+            toggleSolution('function-problem3-btn', 'function-problem3-solution');
+        });
+    </script>
+</body>
+</html>

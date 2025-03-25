@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heun's Method - MATLAB for Computational Engineering</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MATLAB for Computational Engineering</h1>
+            <p>A comprehensive guide to numerical methods and MATLAB programming</p>
+        </div>
+        <div class="attribution">Created by Thomas Coase</div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn active">Numerical Methods</a>
+                    <div class="dropdown-content">
+                        <a href="eulers-method-enhanced.html">Euler's Method</a>
+                        <a href="heuns-method-enhanced.html" class="active">Heun's Method</a>
+                        <a href="newton-raphson-enhanced.html">Newton-Raphson Method</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">MATLAB Fundamentals</a>
+                    <div class="dropdown-content">
+                        <a href="functions.html">Functions</a>
+                        <a href="examples.html">Examples</a>
+                        <a href="resources.html">Resources</a>
+                    </div>
+                </li>
+                <li><a href="functions.html">Functions</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
+            <section class="intro">
+                <h2>Heun's Method</h2>
+                <p>Heun's method, also known as the modified Euler's method or the improved Euler's method, is a second-order numerical technique for solving ordinary differential equations (ODEs). It offers significantly better accuracy than the standard Euler's method while maintaining relative simplicity in implementation.</p>
+                
+                <p>In this guide, we'll explore the mathematical principles behind Heun's method, implement it in MATLAB, analyze its accuracy and stability characteristics, and apply it to solve practical engineering problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Mathematical Foundation</h3>
+                
+                <h4>The Basic Concept</h4>
+                <p>Consider a first-order ordinary differential equation (ODE) of the form:</p>
+                
+                <div class="equation">
+                    \[ \frac{dy}{dt} = f(t, y) \]
+                </div>
+                
+                <p>with an initial condition:</p>
+                
+                <div class="equation">
+                    \[ y(t_0) = y_0 \]
+                </div>
+                
+                <p>While Euler's method uses a single slope evaluation to advance the solution, Heun's method uses two slope evaluations to achieve higher accuracy. The method follows these steps:</p>
+                
+                <ol>
+                    <li>Calculate a predictor step using Euler's method:
+                        <div class="equation">
+                            \[ \tilde{y}_{n+1} = y_n + h \cdot f(t_n, y_n) \]
+                        </div>
+                    </li>
+                    <li>Calculate the slope at the predicted point:
+                        <div class="equation">
+                            \[ f(t_{n+1}, \tilde{y}_{n+1}) \]
+                        </div>
+                    </li>
+                    <li>Use the average of the two slopes for the final update (corrector step):
+                        <div class="equation">
+                            \[ y_{n+1} = y_n + \frac{h}{2} \left[ f(t_n, y_n) + f(t_{n+1}, \tilde{y}_{n+1}) \right] \]
+                        </div>
+                    </li>
+                </ol>
+                
+                <p>This approach can be viewed as a predictor-corrector method, where:</p>
+                <ul>
+                    <li>The predictor step uses Euler's method to get a rough estimate of the next value</li>
+                    <li>The corrector step refines this estimate using the average of the slopes at the current and predicted points</li>
+                </ul>
+                
+                <h4>Relation to Runge-Kutta Methods</h4>
+                <p>Heun's method is actually a special case of the second-order Runge-Kutta methods. In general, Runge-Kutta methods can be written as:</p>
+                
+                <div class="equation">
+                    \[ y_{n+1} = y_n + h \sum_{i=1}^s b_i k_i \]
+                </div>
+                
+                <p>where \(k_i\) are stage values calculated as:</p>
+                
+                <div class="equation">
+                    \[ k_i = f\left(t_n + c_i h, y_n + h \sum_{j=1}^{i-1} a_{ij} k_j\right) \]
+                </div>
+                
+                <p>For Heun's method, we have:</p>
+                <ul>
+                    <li>\(s = 2\) (two stages)</li>
+                    <li>\(c_1 = 0, c_2 = 1\) (evaluation points)</li>
+                    <li>\(a_{21} = 1\) (dependency of second stage on first)</li>
+                    <li>\(b_1 = b_2 = 1/2\) (weights for final combination)</li>
+                </ul>
+                
+                <p>This gives us:</p>
+                <div class="equation">
+                    \[ \begin{align}
+                    k_1 &= f(t_n, y_n) \\
+                    k_2 &= f(t_n + h, y_n + h k_1) \\
+                    y_{n+1} &= y_n + \frac{h}{2}(k_1 + k_2)
+                    \end{align} \]
+                </div>
+                
+                <p>which is exactly Heun's method as described above.</p>
+                
+                <h4>Geometric Interpretation</h4>
+                <p>Geometrically, Heun's method can be interpreted as follows:</p>
+                <ol>
+                    <li>Calculate the slope at the current point: \(f(t_n, y_n)\)</li>
+                    <li>Follow this slope to get a preliminary estimate of the next point</li>
+                    <li>Calculate the slope at this preliminary point: \(f(t_{n+1}, \tilde{y}_{n+1})\)</li>
+                    <li>Use the average of these two slopes to determine the actual step</li>
+                </ol>
+                
+                <p>This is equivalent to using the trapezoidal rule to approximate the integral of the derivative function over the interval \([t_n, t_{n+1}]\).</p>
+                
+                <h4>Error Analysis</h4>
+                <p>Heun's method has two types of errors:</p>
+                
+                <ol>
+                    <li><strong>Local truncation error</strong>: The error introduced in a single step, which is proportional to \(h^3\) (third-order in \(h\))</li>
+                    <li><strong>Global truncation error</strong>: The accumulated error over all steps, which is proportional to \(h^2\) (second-order in \(h\))</li>
+                </ol>
+                
+                <p>This means that halving the step size will approximately reduce the global error by a factor of 4, making Heun's method a second-order method. This is a significant improvement over Euler's method, which is only first-order.</p>
+                
+                <h4>Stability Considerations</h4>
+                <p>For the test equation \(y' = \lambda y\) with \(\lambda < 0\), Heun's method is stable when:</p>
+                
+                <div class="equation">
+                    \[ \left|1 + h\lambda + \frac{(h\lambda)^2}{2}\right| < 1 \]
+                </div>
+                
+                <p>This leads to the stability condition:</p>
+                
+                <div class="equation">
+                    \[ h < \frac{-2\lambda}{|\lambda|^2} \]
+                </div>
+                
+                <p>For large negative values of \(\lambda\) (stiff equations), this stability condition is more restrictive than for Euler's method, which might seem counterintuitive. However, this is a common characteristic of explicit methods: higher-order methods often have smaller stability regions for stiff problems.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>MATLAB Implementation</h3>
+                
+                <h4>Basic Implementation</h4>
+                <p>Let's implement Heun's method in MATLAB to solve ODEs. We'll start with a basic implementation that demonstrates the core algorithm:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = heun_method(f, tspan, y0, h)
+    % HEUN_METHOD Solve ODE using Heun's method (modified Euler's method)
+    %   [T, Y] = HEUN_METHOD(F, TSPAN, Y0, H) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using step size H.
+    %
+    %   Inputs:
+    %       F - Function handle representing the ODE: dy/dt = F(t, y)
+    %       TSPAN - [T0, TFINAL] integration interval
+    %       Y0 - Initial condition
+    %       H - Step size
+    %
+    %   Outputs:
+    %       T - Time points
+    %       Y - Solution values at time points
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    
+    % Handle scalar or vector y
+    if isscalar(y0)
+        y = zeros(n_steps + 1, 1);
+    else
+        y = zeros(length(y0), n_steps + 1);
+    end
+    
+    % Set initial values
+    t(1) = t0;
+    if isscalar(y0)
+        y(1) = y0;
+    else
+        y(:, 1) = y0(:);
+    end
+    
+    % Main integration loop
+    for i = 1:n_steps
+        % Current time and state
+        t_current = t(i);
+        y_current = y(:, i);
+        
+        % Next time
+        t_next = t_current + h;
+        t(i+1) = t_next;
+        
+        % Step 1: Calculate slope at current point (k1)
+        k1 = f(t_current, y_current);
+        
+        % Step 2: Predictor step (Euler's method)
+        y_pred = y_current + h * k1;
+        
+        % Step 3: Calculate slope at predicted point (k2)
+        k2 = f(t_next, y_pred);
+        
+        % Step 4: Corrector step (average of slopes)
+        y(:, i+1) = y_current + (h/2) * (k1 + k2);
+    end
+    
+    % Transpose y if it's a vector to match MATLAB's ode45 output format
+    if size(y, 1) > 1
+        y = y';
+    end
+end</code></pre>
+                </div>
+                
+                <p>This implementation follows the mathematical formula directly. Let's break down what's happening in the MATLAB code:</p>
+                
+                <ol>
+                    <li>We define a function that takes the ODE function handle, time span, initial condition, and step size as inputs.</li>
+                    <li>We calculate the number of steps needed to cover the time span and adjust the step size to exactly reach the final time.</li>
+                    <li>We initialize arrays to store the time points and solution values.</li>
+                    <li>We set the initial values based on the provided initial condition.</li>
+                    <li>In the main loop, for each step:
+                        <ul>
+                            <li>We calculate the slope at the current point: \(k_1 = f(t_n, y_n)\)</li>
+                            <li>We compute a predicted value using Euler's method: \(y_{pred} = y_n + h \cdot k_1\)</li>
+                            <li>We calculate the slope at the predicted point: \(k_2 = f(t_{n+1}, y_{pred})\)</li>
+                            <li>We update the state using the average of the two slopes: \(y_{n+1} = y_n + \frac{h}{2} (k_1 + k_2)\)</li>
+                        </ul>
+                    </li>
+                    <li>Finally, we transpose the solution array if needed to match MATLAB's standard format for ODE solvers.</li>
+                </ol>
+                
+                <h4>Handling Systems of ODEs</h4>
+                <p>Like Euler's method, our implementation of Heun's method can handle both scalar ODEs and systems of ODEs. For a system, \(y\) is a vector, and \(f(t, y)\) returns a vector of the same size.</p>
+                
+                <p>For example, to solve the system:</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    \frac{dy_1}{dt} &= y_2 \\
+                    \frac{dy_2}{dt} &= -y_1
+                    \end{align} \]
+                </div>
+                
+                <p>We would define the ODE function as:</p>
+                
+                <div class="code-example">
+                    <pre><code>f = @(t, y) [y(2); -y(1)];</code></pre>
+                </div>
+                
+                <p>And call our Heun's method with a vector initial condition:</p>
+                
+                <div class="code-example">
+                    <pre><code>[t, y] = heun_method(f, [0, 10], [1; 0], 0.1);</code></pre>
+                </div>
+                
+                <h4>Vectorized Implementation</h4>
+                <p>For better performance, we can vectorize the implementation to avoid some of the loops. However, this is only possible for autonomous systems (where \(f\) doesn't depend explicitly on \(t\)):</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = heun_method_vectorized(f, tspan, y0, h)
+    % HEUN_METHOD_VECTORIZED Vectorized implementation of Heun's method
+    %   Note: This only works for autonomous systems where f doesn't depend on t
+    
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Generate time points
+    t = linspace(t0, tfinal, n_steps + 1)';
+    
+    % Initialize solution array
+    y = zeros(n_steps + 1, length(y0));
+    y(1, :) = y0(:)';
+    
+    % Vectorized implementation
+    for i = 1:n_steps
+        % Current time and state
+        t_current = t(i);
+        t_next = t(i+1);
+        y_current = y(i, :)';
+        
+        % Step 1: Calculate slope at current point (k1)
+        k1 = f(t_current, y_current);
+        
+        % Step 2: Predictor step (Euler's method)
+        y_pred = y_current + h * k1;
+        
+        % Step 3: Calculate slope at predicted point (k2)
+        k2 = f(t_next, y_pred);
+        
+        % Step 4: Corrector step (average of slopes)
+        y(i+1, :) = (y_current + (h/2) * (k1 + k2))';
+    end
+end</code></pre>
+                </div>
+                
+                <p>This implementation is more efficient for large systems or many time steps, but it still requires a loop over time steps.</p>
+                
+                <h4>Comparison with MATLAB's Built-in Solvers</h4>
+                <p>MATLAB provides built-in ODE solvers like <code>ode45</code>, which are more sophisticated than Heun's method. Let's compare our implementation with <code>ode45</code> and the standard Euler's method:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define the ODE: dy/dt = -2y (solution: y = y0*exp(-2t))
+f = @(t, y) -2 * y;
+
+% Time span and initial condition
+tspan = [0, 2];
+y0 = 1;
+
+% Solve using Euler's method
+h = 0.1;
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+
+% Solve using Heun's method
+[t_heun, y_heun] = heun_method(f, tspan, y0, h);
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = y0 * exp(-2 * t_exact);
+
+% Plot results
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler, 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun, 'go-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45, 'bs-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison of Numerical Methods');
+legend('show');
+grid on;
+
+% Calculate errors
+euler_error = abs(y_euler - exp(-2 * t_euler));
+heun_error = abs(y_heun - exp(-2 * t_heun));
+ode45_error = abs(y_ode45 - exp(-2 * t_ode45));
+
+% Display maximum errors
+fprintf('Maximum errors:\n');
+fprintf('Euler: %.6e\n', max(euler_error));
+fprintf('Heun: %.6e\n', max(heun_error));
+fprintf('ode45: %.6e\n', max(ode45_error));</code></pre>
+                </div>
+                
+                <p>This code compares Euler's method, Heun's method, and MATLAB's <code>ode45</code> solver to the exact solution. The results show that:</p>
+                
+                <ol>
+                    <li>Heun's method is significantly more accurate than Euler's method with the same step size</li>
+                    <li>MATLAB's <code>ode45</code> is even more accurate due to its adaptive step size control and higher-order methods</li>
+                    <li>The exact solution provides a reference to evaluate the accuracy of the numerical methods</li>
+                </ol>
+                
+                <h4>Order of Convergence Analysis</h4>
+                <p>To verify that Heun's method is indeed a second-order method, we can perform a convergence analysis by measuring how the error decreases as the step size is reduced:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Convergence analysis
+f = @(t, y) -2 * y;  % Test equation: y' = -2y
+tspan = [0, 1];
+y0 = 1;
+
+% Exact solution at t = 1
+y_exact = exp(-2);
+
+% Test different step sizes
+h_values = logspace(-4, -1, 10);  % From 10^-4 to 10^-1
+errors_euler = zeros(size(h_values));
+errors_heun = zeros(size(h_values));
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Solve using Euler's method
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    errors_euler(i) = abs(y_euler(end) - y_exact);
+    
+    % Solve using Heun's method
+    [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+    errors_heun(i) = abs(y_heun(end) - y_exact);
+end
+
+% Plot errors vs. step size on log-log scale
+figure;
+loglog(h_values, errors_euler, 'ro-', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+loglog(h_values, errors_heun, 'go-', 'LineWidth', 1.5, 'DisplayName', 'Heun');
+
+% Add reference lines for first and second order convergence
+loglog(h_values, h_values, 'k--', 'DisplayName', 'First Order');
+loglog(h_values, h_values.^2, 'b--', 'DisplayName', 'Second Order');
+
+xlabel('Step Size (h)');
+ylabel('Absolute Error');
+title('Convergence Analysis');
+legend('show');
+grid on;
+
+% Fit lines to determine order of convergence
+p_euler = polyfit(log(h_values), log(errors_euler), 1);
+p_heun = polyfit(log(h_values), log(errors_heun), 1);
+
+fprintf('Estimated order of convergence:\n');
+fprintf('Euler: %.2f\n', p_euler(1));
+fprintf('Heun: %.2f\n', p_heun(1));</code></pre>
+                </div>
+                
+                <p>This code measures the error at the final time point for different step sizes and plots the results on a log-log scale. The slope of the line gives the order of convergence. We expect to see a slope of approximately 1 for Euler's method and 2 for Heun's method, confirming that Heun's method is indeed a second-order method.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Practical Applications</h3>
+                
+                <h4>Example 1: Exponential Decay</h4>
+                <p>Let's solve the exponential decay equation:</p>
+                
+                <div class="equation">
+                    \[ \frac{dy}{dt} = -k y \]
+                </div>
+                
+                <p>with \(k = 0.5\) and initial condition \(y(0) = 1\).</p>
+                
+                <p>The exact solution is \(y(t) = e^{-kt} = e^{-0.5t}\).</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define the ODE: dy/dt = -k*y
+k = 0.5;
+f = @(t, y) -k * y;
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 1;
+
+% Solve using Euler's and Heun's methods
+h = 0.5;  % Use a larger step size to see the difference
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+[t_heun, y_heun] = heun_method(f, tspan, y0, h);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(-k * t_exact);
+
+% Plot results
+figure;
+
+% Solution comparison
+subplot(2, 1, 1);
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler, 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun, 'go-', 'DisplayName', 'Heun');
+xlabel('Time');
+ylabel('y(t)');
+title('Exponential Decay: y'' = -0.5y, y(0) = 1');
+legend('show');
+grid on;
+
+% Error analysis
+subplot(2, 1, 2);
+euler_error = abs(y_euler - exp(-k * t_euler));
+heun_error = abs(y_heun - exp(-k * t_heun));
+plot(t_euler, euler_error, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Euler Error');
+hold on;
+plot(t_heun, heun_error, 'g-', 'LineWidth', 1.5, 'DisplayName', 'Heun Error');
+xlabel('Time');
+ylabel('Absolute Error');
+title(sprintf('Error Analysis (h = %.1f)', h));
+legend('show');
+grid on;
+
+% Display maximum errors
+fprintf('Maximum absolute errors:\n');
+fprintf('Euler: %.6e\n', max(euler_error));
+fprintf('Heun: %.6e\n', max(heun_error));
+fprintf('Improvement factor: %.2f\n', max(euler_error) / max(heun_error));</code></pre>
+                </div>
+                
+                <p>This example demonstrates how to:</p>
+                <ol>
+                    <li>Define an ODE representing exponential decay</li>
+                    <li>Solve it using both Euler's and Heun's methods</li>
+                    <li>Compare the numerical solutions with the exact solution</li>
+                    <li>Calculate and visualize the errors</li>
+                </ol>
+                
+                <p>The results show that Heun's method provides a much better approximation than Euler's method, especially with larger step sizes. The error is typically reduced by a factor proportional to the step size, reflecting the higher order of accuracy of Heun's method.</p>
+                
+                <h4>Example 2: Harmonic Oscillator</h4>
+                <p>Now let's solve a second-order ODE representing a harmonic oscillator:</p>
+                
+                <div class="equation">
+                    \[ \frac{d^2x}{dt^2} + \omega^2 x = 0 \]
+                </div>
+                
+                <p>with \(\omega = 2\) and initial conditions \(x(0) = 1\) and \(x'(0) = 0\).</p>
+                
+                <p>We first convert this to a system of first-order ODEs by defining \(y_1 = x\) and \(y_2 = x'\):</p>
+                
+                <div class="equation">
+                    \[ \begin{align}
+                    \frac{dy_1}{dt} &= y_2 \\
+                    \frac{dy_2}{dt} &= -\omega^2 y_1
+                    \end{align} \]
+                </div>
+                
+                <div class="code-example">
+                    <pre><code>% Define the harmonic oscillator system
+omega = 2;
+f = @(t, y) [y(2); -omega^2 * y(1)];
+
+% Time span and initial conditions
+tspan = [0, 10];
+y0 = [1; 0];  % [position; velocity]
+
+% Solve using Euler's and Heun's methods
+h = 0.1;
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+[t_heun, y_heun] = heun_method(f, tspan, y0, h);
+
+% Solve using MATLAB's ode45
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = [cos(omega * t_exact); -omega * sin(omega * t_exact)]';
+
+% Plot results
+figure;
+
+% Position
+subplot(2, 1, 1);
+plot(t_exact, y_exact(:, 1), 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler(:, 1), 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun(:, 1), 'go-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45(:, 1), 'bs-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Position x(t)');
+title('Harmonic Oscillator: x'''' + 4x = 0, x(0) = 1, x''(0) = 0');
+legend('show');
+grid on;
+
+% Velocity
+subplot(2, 1, 2);
+plot(t_exact, y_exact(:, 2), 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler(:, 2), 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun(:, 2), 'go-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45(:, 2), 'bs-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Velocity v(t)');
+legend('show');
+grid on;
+
+% Energy analysis
+% Total energy = Kinetic energy + Potential energy
+% E = (1/2) m \omega^2 x^2 + (1/2) m v^2
+% For simplicity, we set m = 1
+energy_func = @(x, v) 0.5 * omega^2 * x.^2 + 0.5 * v.^2;
+
+figure;
+hold on;
+
+% Calculate energy for exact solution (reference)
+E_exact = energy_func(y_exact(:, 1), y_exact(:, 2));
+E0 = E_exact(1);  % Initial energy
+plot(t_exact, E_exact / E0, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+
+% Calculate energy for numerical solutions
+E_euler = energy_func(y_euler(:, 1), y_euler(:, 2));
+E_heun = energy_func(y_heun(:, 1), y_heun(:, 2));
+E_ode45 = energy_func(y_ode45(:, 1), y_ode45(:, 2));
+
+plot(t_euler, E_euler / E0, 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, E_heun / E0, 'go-', 'DisplayName', 'Heun');
+plot(t_ode45, E_ode45 / E0, 'bs-', 'DisplayName', 'ode45');
+
+xlabel('Time');
+ylabel('Normalized Energy (E/E_0)');
+title('Energy Conservation Analysis');
+legend('show');
+grid on;
+
+% Calculate energy drift
+euler_drift = (E_euler(end) - E0) / E0 * 100;  % Percentage
+heun_drift = (E_heun(end) - E0) / E0 * 100;    % Percentage
+ode45_drift = (E_ode45(end) - E0) / E0 * 100;  % Percentage
+
+fprintf('Energy drift:\n');
+fprintf('Euler: %.2f%%\n', euler_drift);
+fprintf('Heun: %.2f%%\n', heun_drift);
+fprintf('ode45: %.2f%%\n', ode45_drift);</code></pre>
+                </div>
+                
+                <p>This example demonstrates:</p>
+                <ol>
+                    <li>How to convert a second-order ODE to a system of first-order ODEs</li>
+                    <li>How to solve a system of ODEs using both Euler's and Heun's methods</li>
+                    <li>The impact of the numerical method on the accuracy of the solution</li>
+                    <li>How to analyze energy conservation, which is a key property of the harmonic oscillator</li>
+                </ol>
+                
+                <p>The results show that Heun's method preserves the oscillatory behavior much better than Euler's method. Euler's method tends to artificially increase the energy of the system, causing the amplitude of the oscillation to grow over time. Heun's method, being a second-order method, maintains the energy much more accurately, although it still shows some drift over long time periods.</p>
+                
+                <h4>Example 3: Nonlinear Pendulum</h4>
+                <p>Let's solve the nonlinear pendulum equation, which includes the full sine term:</p>
+                
+                <div class="equation">
+                    \[ \frac{d^2\theta}{dt^2} + \frac{g}{L} \sin(\theta) = 0 \]
+                </div>
+                
+                <p>with \(g = 9.81\) m/s², \(L = 1\) m, and initial conditions \(\theta(0) = \pi/2\) rad (90 degrees) and \(\theta'(0) = 0\) rad/s.</p>
+                
+                <p>This is a nonlinear equation that doesn't have a simple analytical solution in terms of elementary functions. The large initial angle makes the small-angle approximation (\(\sin(\theta) \approx \theta\)) invalid, so we need to solve the full nonlinear equation.</p>
+                
+                <div class="code-example">
+                    <pre><code>% Define the nonlinear pendulum system
+g = 9.81;  % Acceleration due to gravity (m/s^2)
+L = 1.0;   % Pendulum length (m)
+
+% Convert to system of first-order ODEs
+% Let y(1) = theta and y(2) = theta'
+f = @(t, y) [y(2); -(g/L) * sin(y(1))];
+
+% Time span and initial conditions
+tspan = [0, 10];
+y0 = [pi/2; 0];   % Initial angle: pi/2 rad (90 degrees), Initial angular velocity: 0 rad/s
+
+% Solve using Euler's and Heun's methods
+h = 0.01;  % Use a small step size for accuracy
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+[t_heun, y_heun] = heun_method(f, tspan, y0, h);
+
+% Solve using MATLAB's ode45
+options = odeset('RelTol', 1e-8, 'AbsTol', 1e-10);  % High accuracy
+[t_ode45, y_ode45] = ode45(f, tspan, y0, options);
+
+% Plot results
+figure;
+
+% Angle
+subplot(2, 1, 1);
+plot(t_euler, y_euler(:, 1), 'r-', 'DisplayName', 'Euler');
+hold on;
+plot(t_heun, y_heun(:, 1), 'g-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45(:, 1), 'b-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time (s)');
+ylabel('Angle \theta (rad)');
+title('Nonlinear Pendulum: \theta'''' + (g/L) sin(\theta) = 0, \theta(0) = \pi/2');
+legend('show');
+grid on;
+
+% Angular velocity
+subplot(2, 1, 2);
+plot(t_euler, y_euler(:, 2), 'r-', 'DisplayName', 'Euler');
+hold on;
+plot(t_heun, y_heun(:, 2), 'g-', 'DisplayName', 'Heun');
+plot(t_ode45, y_ode45(:, 2), 'b-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time (s)');
+ylabel('Angular Velocity \omega (rad/s)');
+legend('show');
+grid on;
+
+% Phase space plot
+figure;
+plot(y_euler(:, 1), y_euler(:, 2), 'r-', 'DisplayName', 'Euler');
+hold on;
+plot(y_heun(:, 1), y_heun(:, 2), 'g-', 'DisplayName', 'Heun');
+plot(y_ode45(:, 1), y_ode45(:, 2), 'b-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Angle \theta (rad)');
+ylabel('Angular Velocity \omega (rad/s)');
+title('Phase Space Plot');
+legend('show');
+grid on;
+
+% Energy analysis
+% Total energy = Kinetic energy + Potential energy
+% E = (1/2) m L^2 \omega^2 + m g L (1 - cos(\theta))
+% For simplicity, we set m = 1
+energy_func = @(theta, omega) 0.5 * L^2 * omega.^2 + g * L * (1 - cos(theta));
+
+figure;
+hold on;
+
+% Calculate energy for numerical solutions
+E_euler = energy_func(y_euler(:, 1), y_euler(:, 2));
+E_heun = energy_func(y_heun(:, 1), y_heun(:, 2));
+E_ode45 = energy_func(y_ode45(:, 1), y_ode45(:, 2));
+
+E0 = E_ode45(1);  % Initial energy (reference)
+
+plot(t_euler, E_euler / E0, 'r-', 'DisplayName', 'Euler');
+plot(t_heun, E_heun / E0, 'g-', 'DisplayName', 'Heun');
+plot(t_ode45, E_ode45 / E0, 'b-', 'LineWidth', 2, 'DisplayName', 'ode45');
+
+xlabel('Time (s)');
+ylabel('Normalized Energy (E/E_0)');
+title('Energy Conservation Analysis');
+legend('show');
+grid on;
+
+% Calculate energy drift
+euler_drift = (E_euler(end) - E0) / E0 * 100;  % Percentage
+heun_drift = (E_heun(end) - E0) / E0 * 100;    % Percentage
+ode45_drift = (E_ode45(end) - E0) / E0 * 100;  % Percentage
+
+fprintf('Energy drift:\n');
+fprintf('Euler: %.2f%%\n', euler_drift);
+fprintf('Heun: %.2f%%\n', heun_drift);
+fprintf('ode45: %.2f%%\n', ode45_drift);
+
+% Period analysis
+% Find zero crossings of angular velocity to estimate period
+zero_crossings_heun = find(diff(sign(y_heun(:, 2))) ~= 0);
+if length(zero_crossings_heun) >= 3
+    % Calculate periods between consecutive zero crossings (every other one)
+    periods_heun = diff(t_heun(zero_crossings_heun(1:2:end))) * 2;
+    fprintf('Estimated period (Heun): %.4f s\n', mean(periods_heun));
+end
+
+zero_crossings_ode45 = find(diff(sign(y_ode45(:, 2))) ~= 0);
+if length(zero_crossings_ode45) >= 3
+    % Calculate periods between consecutive zero crossings (every other one)
+    periods_ode45 = diff(t_ode45(zero_crossings_ode45(1:2:end))) * 2;
+    fprintf('Estimated period (ode45): %.4f s\n', mean(periods_ode45));
+end
+
+% Theoretical period for small oscillations
+T_small = 2 * pi * sqrt(L / g);
+fprintf('Theoretical period for small oscillations: %.4f s\n', T_small);
+
+% Theoretical period for large oscillations (first-order correction)
+k = sin(y0(1) / 2)^2;  % Modulus for elliptic integral
+T_large = T_small * (1 + k/4 + 9*k^2/64 + 25*k^3/256 + 1225*k^4/16384);
+fprintf('Theoretical period for large oscillations: %.4f s\n', T_large);</code></pre>
+                </div>
+                
+                <p>This example demonstrates:</p>
+                <ol>
+                    <li>How to solve a nonlinear ODE using numerical methods</li>
+                    <li>The importance of using a small step size for accuracy with explicit methods</li>
+                    <li>How to analyze the solution in terms of energy conservation and period</li>
+                    <li>The difference between the nonlinear pendulum and the linear approximation (small-angle approximation)</li>
+                </ol>
+                
+                <p>The results show that Heun's method provides a much better approximation of the nonlinear pendulum dynamics than Euler's method, especially in terms of energy conservation. The period of the nonlinear pendulum is longer than that of the linear approximation, and this difference increases with the amplitude of the oscillation.</p>
+            </section>
+            
+            <section class="content-section">
+                <h3>Advanced Topics</h3>
+                
+                <h4>Adaptive Step Size Control</h4>
+                <p>One way to improve Heun's method is to use adaptive step size control, where the step size is adjusted based on the estimated error:</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = adaptive_heun(f, tspan, y0, options)
+    % ADAPTIVE_HEUN Solve ODE using Heun's method with adaptive step size
+    %   [T, Y] = ADAPTIVE_HEUN(F, TSPAN, Y0, OPTIONS) solves the ODE system
+    %   dy/dt = F(t, y) over the interval TSPAN = [T0, TFINAL] with
+    %   initial condition Y0 using adaptive step size control.
+    %
+    %   OPTIONS is a structure with fields:
+    %       InitialStep - Initial step size
+    %       RelTol - Relative tolerance
+    %       AbsTol - Absolute tolerance
+    
+    % Default options
+    if nargin < 4
+        options = struct();
+    end
+    
+    if ~isfield(options, 'InitialStep')
+        options.InitialStep = (tspan(2) - tspan(1)) / 100;
+    end
+    
+    if ~isfield(options, 'RelTol')
+        options.RelTol = 1e-3;
+    end
+    
+    if ~isfield(options, 'AbsTol')
+        options.AbsTol = 1e-6;
+    end
+    
+    % Initialize
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    t = t0;
+    y = y0(:);
+    h = options.InitialStep;
+    
+    % Preallocate arrays with initial capacity
+    capacity = 1000;
+    t_array = zeros(capacity, 1);
+    y_array = zeros(length(y), capacity);
+    
+    % Store initial values
+    t_array(1) = t;
+    y_array(:, 1) = y;
+    count = 1;
+    
+    % Main integration loop
+    while t < tfinal
+        % Ensure we don't go beyond tfinal
+        if t + h > tfinal
+            h = tfinal - t;
+        end
+        
+        % Calculate slopes for Heun's method
+        k1 = f(t, y);
+        y_pred = y + h * k1;
+        k2 = f(t + h, y_pred);
+        
+        % Calculate the Heun step
+        y_heun = y + (h/2) * (k1 + k2);
+        
+        % Calculate a higher-order estimate for error estimation
+        % Here we use a third-order Runge-Kutta method
+        k3 = f(t + h/2, y + (h/2) * k1);
+        y_rk3 = y + h * (k1/6 + 2*k3/3 + k2/6);
+        
+        % Estimate error
+        error = norm(y_heun - y_rk3) / max(norm(y_heun), options.AbsTol/options.RelTol);
+        
+        % Check if step is acceptable
+        if error <= options.RelTol
+            % Accept step
+            t = t + h;
+            y = y_heun;  % Use Heun's method result
+            
+            % Store results
+            count = count + 1;
+            
+            % Resize arrays if needed
+            if count > capacity
+                capacity = capacity * 2;
+                t_array = [t_array; zeros(capacity, 1)];
+                y_array = [y_array, zeros(length(y), capacity)];
+            end
+            
+            t_array(count) = t;
+            y_array(:, count) = y;
+            
+            % Increase step size for next step (aim for error = RelTol)
+            h = h * min(2, max(0.5, 0.8 * (options.RelTol / error)^(1/3)));
+        else
+            % Reject step and reduce step size
+            h = h * max(0.1, 0.8 * (options.RelTol / error)^(1/3));
+        end
+    end
+    
+    % Trim arrays
+    t = t_array(1:count);
+    y = y_array(:, 1:count)';
+end</code></pre>
+                </div>
+                
+                <p>This implementation uses a third-order Runge-Kutta method to estimate the error of the Heun's method step. The step size is adjusted based on the estimated error to maintain accuracy while minimizing computational cost.</p>
+                
+                <p>The key features of this adaptive implementation are:</p>
+                <ol>
+                    <li>Error estimation by comparing Heun's method (second-order) with a third-order Runge-Kutta method</li>
+                    <li>Step size adjustment based on the estimated error and desired tolerance</li>
+                    <li>Step rejection when the error is too large</li>
+                    <li>Dynamic array resizing to accommodate an unknown number of steps</li>
+                </ol>
+                
+                <h4>Embedded Runge-Kutta Methods</h4>
+                <p>A more sophisticated approach to adaptive step size control is to use embedded Runge-Kutta methods, where two approximations of different orders are computed using the same function evaluations. The difference between these approximations provides an estimate of the local truncation error.</p>
+                
+                <p>The Bogacki-Shampine method (ode23 in MATLAB) is an example of an embedded Runge-Kutta method that provides a third-order solution and a second-order solution for error estimation.</p>
+                
+                <div class="code-example">
+                    <pre><code>function [t, y] = bogacki_shampine(f, tspan, y0, options)
+    % BOGACKI_SHAMPINE Solve ODE using Bogacki-Shampine method (similar to ode23)
+    %   This is a 3(2) embedded Runge-Kutta method
+    
+    % Default options
+    if nargin < 4
+        options = struct();
+    end
+    
+    if ~isfield(options, 'InitialStep')
+        options.InitialStep = (tspan(2) - tspan(1)) / 100;
+    end
+    
+    if ~isfield(options, 'RelTol')
+        options.RelTol = 1e-3;
+    end
+    
+    if ~isfield(options, 'AbsTol')
+        options.AbsTol = 1e-6;
+    end
+    
+    % Initialize
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    t = t0;
+    y = y0(:);
+    h = options.InitialStep;
+    
+    % Preallocate arrays
+    capacity = 1000;
+    t_array = zeros(capacity, 1);
+    y_array = zeros(length(y), capacity);
+    
+    % Store initial values
+    t_array(1) = t;
+    y_array(:, 1) = y;
+    count = 1;
+    
+    % Main integration loop
+    while t < tfinal
+        % Ensure we don't go beyond tfinal
+        if t + h > tfinal
+            h = tfinal - t;
+        end
+        
+        % Calculate stages
+        k1 = f(t, y);
+        k2 = f(t + h/2, y + h/2 * k1);
+        k3 = f(t + 3*h/4, y + 3*h/4 * k2);
+        
+        % Third-order solution
+        y_new = y + h * (2*k1/9 + k2/3 + 4*k3/9);
+        
+        % Calculate additional stage for error estimation
+        k4 = f(t + h, y_new);
+        
+        % Second-order solution
+        y_low = y + h * (7*k1/24 + 1*k2/4 + 1*k3/3 + 1*k4/8);
+        
+        % Estimate error
+        error = norm(y_new - y_low) / max(norm(y_new), options.AbsTol/options.RelTol);
+        
+        % Check if step is acceptable
+        if error <= options.RelTol
+            % Accept step
+            t = t + h;
+            y = y_new;
+            
+            % Store results
+            count = count + 1;
+            
+            % Resize arrays if needed
+            if count > capacity
+                capacity = capacity * 2;
+                t_array = [t_array; zeros(capacity, 1)];
+                y_array = [y_array, zeros(length(y), capacity)];
+            end
+            
+            t_array(count) = t;
+            y_array(:, count) = y;
+            
+            % Increase step size for next step
+            h = h * min(2, max(0.5, 0.8 * (options.RelTol / error)^(1/3)));
+        else
+            % Reject step and reduce step size
+            h = h * max(0.1, 0.8 * (options.RelTol / error)^(1/3));
+        end
+    end
+    
+    % Trim arrays
+    t = t_array(1:count);
+    y = y_array(:, 1:count)';
+end</code></pre>
+                </div>
+                
+                <p>This implementation of the Bogacki-Shampine method is similar to MATLAB's <code>ode23</code> solver. It uses four function evaluations per step to compute a third-order solution and a second-order solution. The difference between these solutions provides an estimate of the local truncation error, which is used to adjust the step size.</p>
+                
+                <h4>Stability Analysis</h4>
+                <p>Let's analyze the stability of Heun's method by applying it to the test equation \(y' = \lambda y\) with \(\lambda < 0\):</p>
+                
+                <div class="code-example">
+                    <pre><code>% Stability analysis of Heun's method
+lambda = -5;  % Negative value for stable system
+f = @(t, y) lambda * y;
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 1;
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(lambda * t_exact);
+
+% Test different step sizes
+h_values = [0.1, 0.3, 0.5, 0.8];
+results = cell(length(h_values), 1);
+
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Check stability condition for Heun's method
+    % |1 + h*lambda + (h*lambda)^2/2| < 1
+    stable = abs(1 + h*lambda + (h*lambda)^2/2) < 1;
+    
+    % Solve using Heun's method
+    try
+        [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+        results{i} = struct('t', t_heun, 'y', y_heun, 'h', h, 'stable', stable);
+        
+        % Plot results
+        plot(t_heun, y_heun, 'o-', 'DisplayName', ...
+             sprintf('h=%.1f (%s)', h, conditional(stable, 'stable', 'unstable')));
+    catch
+        fprintf('Solution diverged for h=%.1f\n', h);
+    end
+end
+
+xlabel('Time');
+ylabel('y(t)');
+title(sprintf('Stability Analysis for y'' = %.1fy', lambda));
+legend('show');
+grid on;
+
+% Helper function
+function str = conditional(condition, true_str, false_str)
+    if condition
+        str = true_str;
+    else
+        str = false_str;
+    end
+end</code></pre>
+                </div>
+                
+                <p>This code demonstrates the stability behavior of Heun's method for different step sizes. For the test equation \(y' = \lambda y\) with \(\lambda < 0\), the stability condition for Heun's method is more restrictive than for Euler's method when \(|\lambda|\) is large (stiff equations).</p>
+                
+                <h4>Comparison with Other Methods</h4>
+                <p>Let's compare Heun's method with other numerical methods for solving ODEs:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Compare different numerical methods
+f = @(t, y) -5 * y;  % Test equation: y' = -5y
+
+% Time span and initial condition
+tspan = [0, 2];
+y0 = 1;
+
+% Step size
+h = 0.1;
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exp(-5 * t_exact);
+
+% Euler's method
+[t_euler, y_euler] = euler_method(f, tspan, y0, h);
+
+% Heun's method
+[t_heun, y_heun] = heun_method(f, tspan, y0, h);
+
+% Midpoint method (another second-order method)
+[t_midpoint, y_midpoint] = midpoint_method(f, tspan, y0, h);
+
+% MATLAB's built-in solvers
+[t_ode45, y_ode45] = ode45(f, tspan, y0);
+[t_ode23, y_ode23] = ode23(f, tspan, y0);
+
+% Calculate errors
+euler_error = abs(y_euler - exp(-5 * t_euler));
+heun_error = abs(y_heun - exp(-5 * t_heun));
+midpoint_error = abs(y_midpoint - exp(-5 * t_midpoint));
+ode45_error = abs(y_ode45 - exp(-5 * t_ode45));
+ode23_error = abs(y_ode23 - exp(-5 * t_ode23));
+
+% Plot results
+figure;
+
+% Solutions
+subplot(2, 1, 1);
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler, y_euler, 'ro-', 'DisplayName', 'Euler');
+plot(t_heun, y_heun, 'go-', 'DisplayName', 'Heun');
+plot(t_midpoint, y_midpoint, 'mo-', 'DisplayName', 'Midpoint');
+plot(t_ode45, y_ode45, 'bs-', 'DisplayName', 'ode45');
+plot(t_ode23, y_ode23, 'cs-', 'DisplayName', 'ode23');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison of Numerical Methods');
+legend('show');
+grid on;
+
+% Errors
+subplot(2, 1, 2);
+semilogy(t_euler, euler_error, 'ro-', 'DisplayName', 'Euler Error');
+hold on;
+semilogy(t_heun, heun_error, 'go-', 'DisplayName', 'Heun Error');
+semilogy(t_midpoint, midpoint_error, 'mo-', 'DisplayName', 'Midpoint Error');
+semilogy(t_ode45, ode45_error, 'bs-', 'DisplayName', 'ode45 Error');
+semilogy(t_ode23, ode23_error, 'cs-', 'DisplayName', 'ode23 Error');
+
+xlabel('Time');
+ylabel('Absolute Error');
+title('Error Comparison (Log Scale)');
+legend('show');
+grid on;
+
+% Display maximum errors
+fprintf('Maximum errors:\n');
+fprintf('Euler: %.6e\n', max(euler_error));
+fprintf('Heun: %.6e\n', max(heun_error));
+fprintf('Midpoint: %.6e\n', max(midpoint_error));
+fprintf('ode45: %.6e\n', max(ode45_error));
+fprintf('ode23: %.6e\n', max(ode23_error));
+
+% Midpoint method implementation
+function [t, y] = midpoint_method(f, tspan, y0, h)
+    % Extract time span
+    t0 = tspan(1);
+    tfinal = tspan(2);
+    
+    % Calculate number of steps
+    n_steps = ceil((tfinal - t0) / h);
+    
+    % Adjust step size to exactly reach tfinal
+    h = (tfinal - t0) / n_steps;
+    
+    % Initialize arrays
+    t = zeros(n_steps + 1, 1);
+    
+    % Handle scalar or vector y
+    if isscalar(y0)
+        y = zeros(n_steps + 1, 1);
+    else
+        y = zeros(length(y0), n_steps + 1);
+    end
+    
+    % Set initial values
+    t(1) = t0;
+    if isscalar(y0)
+        y(1) = y0;
+    else
+        y(:, 1) = y0(:);
+    end
+    
+    % Main integration loop
+    for i = 1:n_steps
+        % Current time and state
+        t_current = t(i);
+        y_current = y(:, i);
+        
+        % Next time
+        t_next = t_current + h;
+        t(i+1) = t_next;
+        
+        % Calculate midpoint
+        k1 = f(t_current, y_current);
+        y_mid = y_current + (h/2) * k1;
+        
+        % Calculate slope at midpoint
+        k2 = f(t_current + h/2, y_mid);
+        
+        % Update using midpoint slope
+        y(:, i+1) = y_current + h * k2;
+    end
+    
+    % Transpose y if it's a vector to match MATLAB's ode45 output format
+    if size(y, 1) > 1
+        y = y';
+    end
+end</code></pre>
+                </div>
+                
+                <p>This comparison shows that:</p>
+                <ol>
+                    <li>Heun's method and the midpoint method (both second-order methods) provide similar accuracy, which is significantly better than Euler's method</li>
+                    <li>MATLAB's built-in solvers (<code>ode45</code> and <code>ode23</code>) are even more accurate due to their adaptive step size control and higher-order methods</li>
+                    <li>The choice of method depends on the specific problem, required accuracy, and computational constraints</li>
+                </ol>
+                
+                <h4>Symplectic Methods for Hamiltonian Systems</h4>
+                <p>For Hamiltonian systems (like the harmonic oscillator), it's often beneficial to use symplectic methods that preserve the geometric structure of the system. Heun's method is not symplectic, which explains why it doesn't perfectly conserve energy in the harmonic oscillator example.</p>
+                
+                <p>The symplectic Euler method and the Störmer-Verlet method are examples of symplectic integrators that are commonly used for Hamiltonian systems:</p>
+                
+                <div class="code-example">
+                    <pre><code>% Symplectic Euler method for the harmonic oscillator
+omega = 2;
+H = @(p, q) 0.5 * p.^2 + 0.5 * omega^2 * q.^2;  % Hamiltonian
+
+% Time span and initial conditions
+tspan = [0, 10];
+p0 = 0;    % Initial momentum
+q0 = 1;    % Initial position
+
+% Step size
+h = 0.1;
+
+% Number of steps
+n_steps = ceil((tspan(2) - tspan(1)) / h);
+h = (tspan(2) - tspan(1)) / n_steps;
+
+% Initialize arrays
+t = linspace(tspan(1), tspan(2), n_steps + 1)';
+p = zeros(n_steps + 1, 1);
+q = zeros(n_steps + 1, 1);
+
+% Set initial values
+p(1) = p0;
+q(1) = q0;
+
+% Symplectic Euler method
+for i = 1:n_steps
+    % Update momentum (p) first
+    p(i+1) = p(i) - h * omega^2 * q(i);
+    
+    % Then update position (q) using the updated momentum
+    q(i+1) = q(i) + h * p(i+1);
+end
+
+% Calculate energy
+energy = H(p, q);
+E0 = energy(1);
+
+% Plot results
+figure;
+
+% Position and momentum
+subplot(2, 1, 1);
+plot(t, q, 'b-', 'DisplayName', 'Position (q)');
+hold on;
+plot(t, p, 'r-', 'DisplayName', 'Momentum (p)');
+xlabel('Time');
+ylabel('Value');
+title('Symplectic Euler Method for Harmonic Oscillator');
+legend('show');
+grid on;
+
+% Energy
+subplot(2, 1, 2);
+plot(t, energy / E0, 'k-', 'LineWidth', 1.5);
+xlabel('Time');
+ylabel('Normalized Energy (E/E_0)');
+title('Energy Conservation');
+grid on;
+
+% Calculate energy drift
+energy_drift = (energy(end) - E0) / E0 * 100;  % Percentage
+fprintf('Energy drift (Symplectic Euler): %.2e%%\n', energy_drift);</code></pre>
+                </div>
+                
+                <p>The symplectic Euler method preserves the Hamiltonian structure of the system, which leads to better long-term energy conservation compared to non-symplectic methods like Heun's method.</p>
+            </section>
+            
+            <section class="practice-problems">
+                <h3>Practice Problems</h3>
+                
+                <div class="problem-card">
+                    <h4>Problem 1: Comparison of Euler and Heun Methods</h4>
+                    <p>Consider the initial value problem:</p>
+                    <div class="equation">
+                        \[ \frac{dy}{dt} = -y + t, \quad y(0) = 1 \]
+                    </div>
+                    <ol>
+                        <li>Find the exact solution to this problem</li>
+                        <li>Implement both Euler's method and Heun's method to solve this problem over the interval \([0, 5]\) with step sizes \(h = 0.5, 0.2, 0.1\)</li>
+                        <li>Calculate and compare the errors of both methods at \(t = 5\)</li>
+                        <li>Verify the order of convergence for both methods by plotting the error versus step size on a log-log scale</li>
+                    </ol>
+                    
+                    <button id="heun-problem1-btn" class="btn">Show Solution</button>
+                    
+                    <div id="heun-problem1-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Comparison of Euler and Heun Methods
+% Problem: dy/dt = -y + t, y(0) = 1
+
+% Define the ODE
+f = @(t, y) -y + t;
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 1;
+
+% Exact solution: y(t) = t - 1 + 2*exp(-t)
+exact_solution = @(t) t - 1 + 2*exp(-t);
+
+% Test different step sizes
+h_values = [0.5, 0.2, 0.1];
+results = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Solve using Euler's method
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    
+    % Solve using Heun's method
+    [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+    
+    % Calculate exact solution at the same time points
+    y_exact_euler = exact_solution(t_euler);
+    y_exact_heun = exact_solution(t_heun);
+    
+    % Calculate errors
+    error_euler = abs(y_euler - y_exact_euler);
+    error_heun = abs(y_heun - y_exact_heun);
+    
+    % Store results
+    results{i} = struct('h', h, ...
+                        't_euler', t_euler, 'y_euler', y_euler, ...
+                        't_heun', t_heun, 'y_heun', y_heun, ...
+                        'error_euler', error_euler, 'error_heun', error_heun);
+    
+    % Display errors at t = 5
+    fprintf('Step size h = %.1f:\n', h);
+    fprintf('  Euler error at t = 5: %.6e\n', error_euler(end));
+    fprintf('  Heun error at t = 5: %.6e\n', error_heun(end));
+    fprintf('  Ratio: %.2f\n', error_euler(end) / error_heun(end));
+end
+
+% Plot solutions for the smallest step size
+result = results{end};
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exact_solution(t_exact);
+
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(result.t_euler, result.y_euler, 'ro-', 'DisplayName', 'Euler');
+plot(result.t_heun, result.y_heun, 'go-', 'DisplayName', 'Heun');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison of Numerical Methods');
+legend('show');
+grid on;
+
+% Plot errors for all step sizes
+figure;
+for i = 1:length(h_values)
+    result = results{i};
+    
+    subplot(length(h_values), 1, i);
+    semilogy(result.t_euler, result.error_euler, 'r-', 'DisplayName', 'Euler Error');
+    hold on;
+    semilogy(result.t_heun, result.error_heun, 'g-', 'DisplayName', 'Heun Error');
+    
+    xlabel('Time');
+    ylabel('Absolute Error');
+    title(sprintf('Error Comparison (h = %.1f)', result.h));
+    legend('show');
+    grid on;
+end
+
+% Convergence analysis
+h_convergence = logspace(-3, -1, 10);
+errors_euler = zeros(size(h_convergence));
+errors_heun = zeros(size(h_convergence));
+
+for i = 1:length(h_convergence)
+    h = h_convergence(i);
+    
+    % Solve using Euler's method
+    [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+    
+    % Solve using Heun's method
+    [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+    
+    % Calculate errors at the final time point
+    errors_euler(i) = abs(y_euler(end) - exact_solution(t_euler(end)));
+    errors_heun(i) = abs(y_heun(end) - exact_solution(t_heun(end)));
+end
+
+% Plot errors vs. step size on log-log scale
+figure;
+loglog(h_convergence, errors_euler, 'ro-', 'LineWidth', 1.5, 'DisplayName', 'Euler');
+hold on;
+loglog(h_convergence, errors_heun, 'go-', 'LineWidth', 1.5, 'DisplayName', 'Heun');
+
+% Add reference lines for first and second order convergence
+loglog(h_convergence, h_convergence, 'k--', 'DisplayName', 'First Order');
+loglog(h_convergence, h_convergence.^2, 'b--', 'DisplayName', 'Second Order');
+
+xlabel('Step Size (h)');
+ylabel('Absolute Error at t = 5');
+title('Convergence Analysis');
+legend('show');
+grid on;
+
+% Fit lines to determine order of convergence
+p_euler = polyfit(log(h_convergence), log(errors_euler), 1);
+p_heun = polyfit(log(h_convergence), log(errors_heun), 1);
+
+fprintf('Estimated order of convergence:\n');
+fprintf('Euler: %.2f\n', p_euler(1));
+fprintf('Heun: %.2f\n', p_heun(1));</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 2: Stiff ODE</h4>
+                    <p>Consider the stiff ODE:</p>
+                    <div class="equation">
+                        \[ \frac{dy}{dt} = -50y + 50\sin(t), \quad y(0) = 0 \]
+                    </div>
+                    <ol>
+                        <li>Implement Euler's method and Heun's method to solve this problem over the interval \([0, 5]\)</li>
+                        <li>Experiment with different step sizes to find the stability limit for each method</li>
+                        <li>Compare the results with MATLAB's <code>ode15s</code> solver, which is designed for stiff problems</li>
+                        <li>Discuss the limitations of explicit methods like Euler's and Heun's methods for stiff problems</li>
+                    </ol>
+                    
+                    <button id="heun-problem2-btn" class="btn">Show Solution</button>
+                    
+                    <div id="heun-problem2-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Stiff ODE Problem
+% Problem: dy/dt = -50y + 50sin(t), y(0) = 0
+
+% Define the ODE
+f = @(t, y) -50*y + 50*sin(t);
+
+% Time span and initial condition
+tspan = [0, 5];
+y0 = 0;
+
+% Exact solution: y(t) = (50/2501) * (sin(t) - 50*cos(t) + 50*exp(-50*t))
+exact_solution = @(t) (50/2501) * (sin(t) - 50*cos(t) + 50*exp(-50*t));
+
+% Test different step sizes for Euler's method
+h_values_euler = [0.04, 0.039, 0.038];
+results_euler = cell(length(h_values_euler), 1);
+
+fprintf('Euler''s method:\n');
+for i = 1:length(h_values_euler)
+    h = h_values_euler(i);
+    
+    % Check stability condition for Euler's method
+    % |1 + h*lambda| < 1, where lambda = -50
+    stable = abs(1 - 50*h) < 1;
+    fprintf('  h = %.3f: %s (|1 + h*lambda| = %.3f)\n', ...
+            h, conditional(stable, 'stable', 'unstable'), abs(1 - 50*h));
+    
+    % Solve using Euler's method
+    try
+        [t_euler, y_euler] = euler_method(f, tspan, y0, h);
+        results_euler{i} = struct('h', h, 't', t_euler, 'y', y_euler, 'stable', stable);
+    catch
+        fprintf('  Solution diverged\n');
+        results_euler{i} = struct('h', h, 'stable', stable);
+    end
+end
+
+% Test different step sizes for Heun's method
+h_values_heun = [0.08, 0.07, 0.06];
+results_heun = cell(length(h_values_heun), 1);
+
+fprintf('\nHeun''s method:\n');
+for i = 1:length(h_values_heun)
+    h = h_values_heun(i);
+    
+    % Check stability condition for Heun's method
+    % |1 + h*lambda + (h*lambda)^2/2| < 1, where lambda = -50
+    stable = abs(1 - 50*h + ((-50*h)^2)/2) < 1;
+    fprintf('  h = %.3f: %s (|1 + h*lambda + (h*lambda)^2/2| = %.3f)\n', ...
+            h, conditional(stable, 'stable', 'unstable'), ...
+            abs(1 - 50*h + ((-50*h)^2)/2));
+    
+    % Solve using Heun's method
+    try
+        [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+        results_heun{i} = struct('h', h, 't', t_heun, 'y', y_heun, 'stable', stable);
+    catch
+        fprintf('  Solution diverged\n');
+        results_heun{i} = struct('h', h, 'stable', stable);
+    end
+end
+
+% Solve using MATLAB's ode15s (stiff solver)
+options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
+[t_ode15s, y_ode15s] = ode15s(f, tspan, y0, options);
+
+% Exact solution
+t_exact = linspace(tspan(1), tspan(2), 1000);
+y_exact = exact_solution(t_exact);
+
+% Plot results
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+% Plot Euler results
+for i = 1:length(h_values_euler)
+    result = results_euler{i};
+    if isfield(result, 't')
+        plot(result.t, result.y, 'o-', 'DisplayName', ...
+             sprintf('Euler (h=%.3f)', result.h));
+    end
+end
+
+% Plot Heun results
+for i = 1:length(h_values_heun)
+    result = results_heun{i};
+    if isfield(result, 't')
+        plot(result.t, result.y, 's-', 'DisplayName', ...
+             sprintf('Heun (h=%.3f)', result.h));
+    end
+end
+
+plot(t_ode15s, y_ode15s, 'r-', 'LineWidth', 1.5, 'DisplayName', 'ode15s');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Stiff ODE: y'' = -50y + 50sin(t), y(0) = 0');
+legend('show');
+grid on;
+
+% Zoom in to see oscillations
+figure;
+plot(t_exact(t_exact <= 0.5), y_exact(t_exact <= 0.5), 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+
+% Plot Euler results
+for i = 1:length(h_values_euler)
+    result = results_euler{i};
+    if isfield(result, 't')
+        idx = result.t <= 0.5;
+        plot(result.t(idx), result.y(idx), 'o-', 'DisplayName', ...
+             sprintf('Euler (h=%.3f)', result.h));
+    end
+end
+
+% Plot Heun results
+for i = 1:length(h_values_heun)
+    result = results_heun{i};
+    if isfield(result, 't')
+        idx = result.t <= 0.5;
+        plot(result.t(idx), result.y(idx), 's-', 'DisplayName', ...
+             sprintf('Heun (h=%.3f)', result.h));
+    end
+end
+
+plot(t_ode15s(t_ode15s <= 0.5), y_ode15s(t_ode15s <= 0.5), 'r-', 'LineWidth', 1.5, 'DisplayName', 'ode15s');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Stiff ODE (Zoomed In)');
+legend('show');
+grid on;
+
+% Solve with a very small step size for reference
+h_small = 0.001;
+[t_euler_small, y_euler_small] = euler_method(f, tspan, y0, h_small);
+[t_heun_small, y_heun_small] = heun_method(f, tspan, y0, h_small);
+
+% Plot comparison with very small step size
+figure;
+plot(t_exact, y_exact, 'k-', 'LineWidth', 2, 'DisplayName', 'Exact');
+hold on;
+plot(t_euler_small, y_euler_small, 'r-', 'DisplayName', sprintf('Euler (h=%.3f)', h_small));
+plot(t_heun_small, y_heun_small, 'g-', 'DisplayName', sprintf('Heun (h=%.3f)', h_small));
+plot(t_ode15s, y_ode15s, 'b-', 'LineWidth', 1.5, 'DisplayName', 'ode15s');
+
+xlabel('Time');
+ylabel('y(t)');
+title('Comparison with Very Small Step Size');
+legend('show');
+grid on;
+
+% Helper function
+function str = conditional(condition, true_str, false_str)
+    if condition
+        str = true_str;
+    else
+        str = false_str;
+    end
+end</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card">
+                    <h4>Problem 3: Lorenz System</h4>
+                    <p>The Lorenz system is a set of three coupled nonlinear differential equations:</p>
+                    <div class="equation">
+                        \[ \begin{align}
+                        \frac{dx}{dt} &= \sigma(y - x) \\
+                        \frac{dy}{dt} &= x(\rho - z) - y \\
+                        \frac{dz}{dt} &= xy - \beta z
+                        \end{align} \]
+                    </div>
+                    <p>with parameters \(\sigma = 10\), \(\rho = 28\), and \(\beta = 8/3\).</p>
+                    <ol>
+                        <li>Implement Heun's method to solve the Lorenz system over the interval \([0, 20]\) with initial conditions \(x(0) = 1\), \(y(0) = 1\), and \(z(0) = 1\)</li>
+                        <li>Create a 3D plot of the solution trajectory</li>
+                        <li>Compare the results with MATLAB's <code>ode45</code> solver</li>
+                        <li>Experiment with different step sizes and discuss the impact on accuracy and stability</li>
+                    </ol>
+                    
+                    <button id="heun-problem3-btn" class="btn">Show Solution</button>
+                    
+                    <div id="heun-problem3-solution" style="display: none;">
+                        <div class="code-example">
+                            <pre><code>% Lorenz System Problem
+% Parameters
+sigma = 10;
+rho = 28;
+beta = 8/3;
+
+% Define the Lorenz system
+f = @(t, y) [
+    sigma * (y(2) - y(1));
+    y(1) * (rho - y(3)) - y(2);
+    y(1) * y(2) - beta * y(3)
+];
+
+% Time span and initial conditions
+tspan = [0, 20];
+y0 = [1; 1; 1];  % [x; y; z]
+
+% Solve using Heun's method with different step sizes
+h_values = [0.01, 0.005, 0.001];
+results_heun = cell(length(h_values), 1);
+
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Solve using Heun's method
+    [t_heun, y_heun] = heun_method(f, tspan, y0, h);
+    results_heun{i} = struct('h', h, 't', t_heun, 'y', y_heun);
+    
+    % Calculate number of function evaluations
+    n_evals = 2 * length(t_heun);
+    fprintf('Heun''s method (h = %.3f): %d function evaluations\n', h, n_evals);
+end
+
+% Solve using MATLAB's ode45
+options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
+[t_ode45, y_ode45] = ode45(f, tspan, y0, options);
+fprintf('ode45: %d function evaluations\n', length(t_ode45) * 6);  % ode45 uses 6 function evaluations per step
+
+% Plot 3D trajectories
+figure;
+for i = 1:length(h_values)
+    result = results_heun{i};
+    
+    subplot(2, 2, i);
+    plot3(result.y(:, 1), result.y(:, 2), result.y(:, 3), 'LineWidth', 1.5);
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
+    title(sprintf('Heun''s Method (h = %.3f)', result.h));
+    grid on;
+    view([-30, 30]);
+end
+
+subplot(2, 2, 4);
+plot3(y_ode45(:, 1), y_ode45(:, 2), y_ode45(:, 3), 'LineWidth', 1.5);
+xlabel('x');
+ylabel('y');
+zlabel('z');
+title('MATLAB''s ode45');
+grid on;
+view([-30, 30]);
+
+% Plot time series
+figure;
+for i = 1:3
+    subplot(3, 1, i);
+    hold on;
+    
+    % Plot Heun results
+    for j = 1:length(h_values)
+        result = results_heun{j};
+        plot(result.t, result.y(:, i), 'DisplayName', sprintf('Heun (h=%.3f)', result.h));
+    end
+    
+    % Plot ode45 result
+    plot(t_ode45, y_ode45(:, i), 'k-', 'LineWidth', 2, 'DisplayName', 'ode45');
+    
+    xlabel('Time');
+    ylabel(sprintf('y_%d', i));
+    title(sprintf('Component y_%d', i));
+    legend('show');
+    grid on;
+end
+
+% Compute reference solution with very small step size
+h_ref = 0.0001;
+[t_ref, y_ref] = heun_method(f, tspan, y0, h_ref);
+
+% Interpolate reference solution to compare with other solutions
+errors = zeros(length(h_values), 1);
+for i = 1:length(h_values)
+    result = results_heun{i};
+    
+    % Interpolate reference solution at the same time points
+    y_ref_interp = zeros(size(result.y));
+    for j = 1:3
+        y_ref_interp(:, j) = interp1(t_ref, y_ref(:, j), result.t);
+    end
+    
+    % Calculate RMS error
+    errors(i) = sqrt(mean(sum((result.y - y_ref_interp).^2, 2)));
+end
+
+% Plot errors vs. step size
+figure;
+loglog(h_values, errors, 'o-', 'LineWidth', 1.5);
+xlabel('Step Size (h)');
+ylabel('RMS Error');
+title('Error vs. Step Size');
+grid on;
+
+% Fit a line to determine order of convergence
+p = polyfit(log(h_values), log(errors), 1);
+hold on;
+loglog(h_values, exp(p(2)) * h_values.^p(1), 'r--', 'LineWidth', 1.5);
+legend('Numerical Results', sprintf('Fitted Line (slope = %.2f)', p(1)));
+
+fprintf('Estimated order of convergence: %.2f\n', p(1));
+
+% Computational efficiency analysis
+figure;
+times = zeros(length(h_values), 1);
+for i = 1:length(h_values)
+    h = h_values(i);
+    
+    % Measure computation time
+    tic;
+    [~, ~] = heun_method(f, tspan, y0, h);
+    times(i) = toc;
+    
+    fprintf('Heun''s method (h = %.3f): %.3f seconds\n', h, times(i));
+end
+
+% Measure ode45 time
+tic;
+[~, ~] = ode45(f, tspan, y0, options);
+time_ode45 = toc;
+fprintf('ode45: %.3f seconds\n', time_ode45);
+
+% Plot error vs. computation time
+loglog(times, errors, 'o-', 'LineWidth', 1.5);
+xlabel('Computation Time (s)');
+ylabel('RMS Error');
+title('Error vs. Computation Time');
+grid on;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MATLAB for Computational Engineering</h3>
+                    <p>A comprehensive guide to numerical methods and MATLAB programming for engineering applications.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="eulers-method-enhanced.html">Euler's Method</a></li>
+                        <li><a href="heuns-method-enhanced.html">Heun's Method</a></li>
+                        <li><a href="newton-raphson-enhanced.html">Newton-Raphson Method</a></li>
+                        <li><a href="functions.html">Functions</a></li>
+                        <li><a href="examples.html">Interactive Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="contact-info">
+                        <p>For questions, feedback, or suggestions, please contact:</p>
+                        <p><a href="mailto:Thomas.Coase@gmail.com" class="contact-email">Thomas.Coase@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 MATLAB for Computational Engineering. All code examples are free to use and modify.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up solution toggles
+            toggleSolution('heun-problem1-btn', 'heun-problem1-solution');
+            toggleSolution('heun-problem2-btn', 'heun-problem2-solution');
+            toggleSolution('heun-problem3-btn', 'heun-problem3-solution');
+        });
+    </script>
+</body>
+</html>
